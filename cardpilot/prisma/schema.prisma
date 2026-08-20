@@ -1,0 +1,158 @@
+// CardPilot data model — SQLite for local dev, kept Postgres-compatible.
+// Money is stored as Float for MVP simplicity; migrate to integer cents or
+// Decimal when moving to Postgres.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  passwordHash String
+  createdAt    DateTime      @default(now())
+  cards        Card[]
+  transactions Transaction[]
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Card {
+  id               String            @id @default(cuid())
+  userId           String
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name             String
+  issuer           String
+  network          String? // visa | mastercard | amex | discover
+  lastFour         String?
+  creditLimit      Float
+  currentBalance   Float             @default(0)
+  annualFee        Float             @default(0)
+  statementDay     Int // day of month statement closes (1-28)
+  dueDay           Int // day of month payment is due (1-28)
+  openedAt         DateTime?
+  cardTheme        String            @default("midnight")
+  active           Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  rewardCategories RewardCategory[]
+  benefits         Benefit[]
+  signupBonuses    SignupBonus[]
+  transactions     Transaction[]
+  rewards          Reward[]
+  statementPeriods StatementPeriod[]
+
+  @@index([userId])
+}
+
+model RewardCategory {
+  id          String    @id @default(cuid())
+  cardId      String
+  card        Card      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  category    String // dining | groceries | travel | gas | streaming | drugstores | online_shopping | everything | ...
+  multiplier  Float
+  startDate   DateTime? // null = always active
+  endDate     DateTime? // null = no end
+  spendingCap Float? // max spend eligible for this multiplier within the active window
+  notes       String?
+
+  @@index([cardId])
+}
+
+model Benefit {
+  id             String    @id @default(cuid())
+  cardId         String
+  card           Card      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  benefitType    String // dining_credit | travel_credit | streaming_credit | hotel_credit | airline_credit | free_night | lounge_access | other
+  totalValue     Float
+  usedValue      Float     @default(0)
+  resetFrequency String // monthly | quarterly | semiannual | annual | one_time
+  startDate      DateTime
+  expirationDate DateTime?
+  active         Boolean   @default(true)
+
+  @@index([cardId])
+}
+
+model SignupBonus {
+  id               String   @id @default(cuid())
+  cardId           String
+  card             Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  spendRequirement Float
+  rewardAmount     Float
+  rewardType       String // points | miles | cashback
+  deadline         DateTime
+  completed        Boolean  @default(false)
+
+  @@index([cardId])
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardId          String
+  card            Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  merchant        String
+  amount          Float
+  category        String
+  transactionDate DateTime
+  status          String   @default("posted") // pending | posted
+  isRefund        Boolean  @default(false)
+  externalId      String? // for future CSV import dedupe
+  createdAt       DateTime @default(now())
+  rewards         Reward[]
+
+  @@unique([cardId, externalId])
+  @@index([userId])
+  @@index([cardId])
+  @@index([transactionDate])
+  @@index([category])
+}
+
+model Reward {
+  id            String      @id @default(cuid())
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  cardId        String
+  card          Card        @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  multiplier    Float
+  rewardAmount  Float
+  rewardType    String // points | miles | cashback
+  createdAt     DateTime    @default(now())
+
+  @@index([cardId])
+  @@index([transactionId])
+}
+
+model StatementPeriod {
+  id               String   @id @default(cuid())
+  cardId           String
+  card             Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  startDate        DateTime
+  endDate          DateTime
+  statementBalance Float
+  minimumPayment   Float?
+  dueDate          DateTime
+  paid             Boolean  @default(false)
+
+  @@index([cardId])
+}
