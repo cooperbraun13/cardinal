@@ -3,20 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/client";
-import { rewardCategorySchema } from "@/lib/validation";
 import { CATEGORIES, EVERYTHING, categoryLabel } from "@/lib/categories";
-import { Button } from "@/components/ui/button";
+import { rewardCategorySchema } from "@/lib/validation";
+import { ErrorBanner } from "@/components/ErrorBanner";
+import { Field } from "@/components/forms/Field";
+import { FormActions } from "@/components/forms/FormActions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Field } from "@/components/forms/Field";
-import { ErrorBanner } from "@/components/ErrorBanner";
 
 export function RewardRuleForm({
   open,
@@ -39,11 +33,11 @@ export function RewardRuleForm({
   const [pending, setPending] = useState(false);
 
   function set<K extends keyof typeof values>(key: K, value: string) {
-    setValues((v) => ({ ...v, [key]: value }));
+    setValues((current) => ({ ...current, [key]: value }));
   }
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
     setError("");
     const parsed = rewardCategorySchema.safeParse({
       category: values.category,
@@ -56,6 +50,7 @@ export function RewardRuleForm({
       setError(parsed.error.issues[0].message);
       return;
     }
+
     setPending(true);
     try {
       await apiFetch(`/api/cards/${cardId}/reward-categories`, {
@@ -63,10 +58,10 @@ export function RewardRuleForm({
         body: parsed.data,
       });
       onOpenChange(false);
-      setValues((v) => ({ ...v, multiplier: "", spendingCap: "" }));
+      setValues((current) => ({ ...current, multiplier: "", spendingCap: "" }));
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Something went wrong.");
     } finally {
       setPending(false);
     }
@@ -78,17 +73,17 @@ export function RewardRuleForm({
         <DialogHeader>
           <DialogTitle>Add reward rule</DialogTitle>
         </DialogHeader>
-        <form onSubmit={submit} className="grid gap-3">
+        <form onSubmit={submit} className="grid gap-4">
           {error && <ErrorBanner message={error} />}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Category">
               <NativeSelect
                 value={values.category}
-                onChange={(e) => set("category", e.target.value)}
+                onChange={(event) => set("category", event.target.value)}
               >
-                {[...CATEGORIES, EVERYTHING].map((c) => (
-                  <option key={c} value={c}>
-                    {categoryLabel(c)}
+                {[...CATEGORIES, EVERYTHING].map((category) => (
+                  <option key={category} value={category}>
+                    {categoryLabel(category)}
                   </option>
                 ))}
               </NativeSelect>
@@ -99,44 +94,42 @@ export function RewardRuleForm({
                 min="0.5"
                 step="0.5"
                 value={values.multiplier}
-                onChange={(e) => set("multiplier", e.target.value)}
+                onChange={(event) => set("multiplier", event.target.value)}
                 placeholder="3"
                 required
               />
             </Field>
-            <Field label="Starts (optional — for promos)">
+            <Field label="Starts (optional)">
               <Input
                 type="date"
                 value={values.startDate}
-                onChange={(e) => set("startDate", e.target.value)}
+                onChange={(event) => set("startDate", event.target.value)}
               />
             </Field>
             <Field label="Ends (optional)">
               <Input
                 type="date"
                 value={values.endDate}
-                onChange={(e) => set("endDate", e.target.value)}
+                onChange={(event) => set("endDate", event.target.value)}
               />
             </Field>
-            <Field label="Spending cap ($, optional)" className="col-span-2">
+            <Field label="Spending cap ($, optional)" className="sm:col-span-2">
               <Input
                 type="number"
                 min="1"
                 step="1"
                 value={values.spendingCap}
-                onChange={(e) => set("spendingCap", e.target.value)}
-                placeholder="e.g. 1500 per window"
+                onChange={(event) => set("spendingCap", event.target.value)}
+                placeholder="1500 per promotion window"
               />
             </Field>
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={pending}>
-              {pending ? "Adding…" : "Add rule"}
-            </Button>
-          </DialogFooter>
+          <FormActions
+            onCancel={() => onOpenChange(false)}
+            pending={pending}
+            submitLabel="Add rule"
+            pendingLabel="Adding..."
+          />
         </form>
       </DialogContent>
     </Dialog>
