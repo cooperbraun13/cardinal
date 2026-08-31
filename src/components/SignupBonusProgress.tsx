@@ -14,11 +14,18 @@ export interface BonusWithProgress {
   card: { name: string };
 }
 
-export function SignupBonusProgress({ bonus }: { bonus: BonusWithProgress }) {
+export function SignupBonusProgress({
+  bonus,
+  flat = false,
+}: {
+  bonus: BonusWithProgress;
+  /** true when rendered inside an existing panel — skips its own surface. */
+  flat?: boolean;
+}) {
   const days = daysUntil(bonus.deadline);
   const expired = days < 0 && !bonus.met;
   return (
-    <div className="glass rounded-2xl border border-border p-4">
+    <div className={flat ? "" : "panel p-4"}>
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-sm font-medium">{bonus.card.name}</p>
@@ -28,9 +35,9 @@ export function SignupBonusProgress({ bonus }: { bonus: BonusWithProgress }) {
           </p>
         </div>
         {bonus.met ? (
-          <Badge className="bg-emerald-500/15 text-emerald-400">Earned</Badge>
+          <Badge variant="secondary">Earned</Badge>
         ) : expired ? (
-          <Badge className="bg-red-500/15 text-red-400">Expired</Badge>
+          <Badge className="bg-primary/15 text-primary">Expired</Badge>
         ) : (
           <Badge variant="secondary">{days}d left</Badge>
         )}

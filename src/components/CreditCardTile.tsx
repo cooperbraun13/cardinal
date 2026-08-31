@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { formatCurrency, nextOccurrence, formatShortDate } from "@/lib/format";
-import { categoryLabel } from "@/lib/categories";
 import { utilization } from "@/services/rewards";
 import { UtilizationBar } from "@/components/UtilizationBar";
 
@@ -18,7 +17,6 @@ export interface CreditCardTileData {
   statementDay: number;
   dueDay: number;
   cardTheme: string;
-  topCategories?: { category: string; multiplier: number }[];
 }
 
 const NETWORK_LABELS: Record<string, string> = {
@@ -28,7 +26,15 @@ const NETWORK_LABELS: Record<string, string> = {
   discover: "Discover",
 };
 
-/** The CSS-rendered credit card visual — real-card proportions, per-card gradient theme. */
+function wholeCurrency(n: number): string {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+}
+
+/** CSS-rendered credit card — flat theme gradient, functional data, no ornament. */
 export function CreditCardTile({
   card,
   selected = false,
@@ -43,14 +49,10 @@ export function CreditCardTile({
   className?: string;
 }) {
   const util = utilization(card.currentBalance, card.creditLimit);
-  const topCategories = (card.topCategories ?? [])
-    .filter((c) => c.multiplier > 1)
-    .sort((a, b) => b.multiplier - a.multiplier)
-    .slice(0, 3);
 
   return (
     <motion.div
-      whileHover={{ y: -4 }}
+      whileHover={onClick ? { y: -3 } : undefined}
       transition={{ type: "spring", stiffness: 400, damping: 28 }}
       onClick={onClick}
       role={onClick ? "button" : undefined}
@@ -58,85 +60,71 @@ export function CreditCardTile({
       onKeyDown={onClick ? (e) => (e.key === "Enter" || e.key === " ") && onClick() : undefined}
       className={cn(
         `card-theme-${card.cardTheme}`,
-        "relative aspect-[1.586] w-full min-w-64 select-none overflow-hidden rounded-2xl p-4 text-white shadow-lg shadow-black/40 transition-shadow sm:p-5",
-        onClick && "cursor-pointer hover:shadow-xl hover:shadow-black/50",
-        selected && "ring-2 ring-white/70 ring-offset-2 ring-offset-background",
+        "relative aspect-[1.586] w-full min-w-60 select-none overflow-hidden rounded-xl p-4 text-white ring-1 ring-white/10 ring-inset sm:p-5",
+        onClick && "cursor-pointer transition-shadow hover:ring-white/25",
+        selected && "ring-2 ring-white/70",
         className
       )}
     >
-      {/* subtle sheen */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10" />
-
-      <div className="relative flex h-full flex-col justify-between">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <p className="truncate text-[13px] font-medium tracking-wide text-white/70">
-              {card.issuer}
-            </p>
-            <p className="truncate text-base font-semibold sm:text-lg">{card.name}</p>
-          </div>
+      <div className="relative flex h-full flex-col">
+        {/* Issuer / network */}
+        <div className="flex items-start justify-between gap-3">
+          <p className="truncate text-[10px] leading-4 font-semibold tracking-[0.16em] text-white/55 uppercase">
+            {card.issuer}
+          </p>
           {card.network && (
-            <span className="shrink-0 text-sm font-bold tracking-wider text-white/80 italic">
+            <span className="shrink-0 text-xs font-bold tracking-widest text-white/75 italic">
               {NETWORK_LABELS[card.network] ?? card.network}
             </span>
           )}
         </div>
+        <p className="mt-0.5 truncate text-base leading-5 font-bold tracking-tight">{card.name}</p>
 
-        <div className="flex items-center gap-3">
-          {/* chip graphic */}
-          <div className="grid h-7 w-9 shrink-0 grid-cols-3 gap-px overflow-hidden rounded-md bg-gradient-to-br from-yellow-200/90 to-yellow-500/90 p-1">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="rounded-[1px] bg-yellow-700/40" />
-            ))}
+        {/* Chip + number */}
+        <div className="my-auto flex items-center gap-3 py-1.5">
+          <div className="relative h-6 w-8 shrink-0 overflow-hidden rounded-[4px] bg-white/20">
+            <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-black/30" />
+            <div className="absolute inset-y-0 left-1/3 w-px bg-black/30" />
+            <div className="absolute inset-y-0 right-1/3 w-px bg-black/30" />
           </div>
-          <span className="font-mono text-sm tracking-[0.2em] text-white/80">
+          <span className="font-mono text-xs tracking-[0.3em] text-white/75">
             •••• {card.lastFour ?? "0000"}
           </span>
         </div>
 
-        <div>
-          <div className="flex items-end justify-between gap-2">
-            <div>
-              <p className="text-[11px] tracking-wide text-white/60 uppercase">Balance</p>
-              <p className="text-lg font-semibold tabular-nums sm:text-xl">
-                {formatCurrency(card.currentBalance)}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-[11px] tracking-wide text-white/60 uppercase">Limit</p>
-              <p className="text-sm font-medium tabular-nums text-white/85">
-                {formatCurrency(card.creditLimit, { compact: true })}
-              </p>
-            </div>
+        {/* Balance / limit */}
+        <div className="flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[9px] leading-4 font-semibold tracking-[0.16em] text-white/50 uppercase">
+              Balance
+            </p>
+            <p className="text-[17px] leading-6 font-bold tracking-tight tabular-nums">
+              {formatCurrency(card.currentBalance)}
+            </p>
           </div>
-          <div className="mt-2 flex items-center gap-2">
-            <UtilizationBar value={util} className="flex-1" />
-            <span className="text-[11px] font-medium tabular-nums text-white/75">
-              {util.toFixed(0)}%
-            </span>
+          <div className="shrink-0 text-right">
+            <p className="text-[9px] leading-4 font-semibold tracking-[0.16em] text-white/50 uppercase">
+              Limit
+            </p>
+            <p className="text-sm leading-6 font-medium tabular-nums text-white/85">
+              {wholeCurrency(card.creditLimit)}
+            </p>
           </div>
-
-          {!compact && (
-            <div className="mt-2.5 flex items-center justify-between gap-2 text-[11px] text-white/65">
-              <span>
-                Due {formatShortDate(nextOccurrence(card.dueDay))} · Closes{" "}
-                {formatShortDate(nextOccurrence(card.statementDay))}
-              </span>
-              {topCategories.length > 0 && (
-                <span className="flex gap-1">
-                  {topCategories.map((c) => (
-                    <span
-                      key={c.category}
-                      className="rounded-full bg-white/15 px-1.5 py-0.5 font-medium whitespace-nowrap"
-                    >
-                      {c.multiplier}x {categoryLabel(c.category)}
-                    </span>
-                  ))}
-                </span>
-              )}
-            </div>
-          )}
         </div>
+
+        {/* Utilization */}
+        <div className="mt-2 flex items-center gap-2">
+          <UtilizationBar value={util} className="flex-1" trackClassName="bg-black/30" />
+          <span className="w-8 text-right text-[11px] font-semibold tabular-nums text-white/70">
+            {util.toFixed(0)}%
+          </span>
+        </div>
+
+        {!compact && (
+          <p className="mt-2 text-[11px] leading-4 text-white/55">
+            Due {formatShortDate(nextOccurrence(card.dueDay))}
+          </p>
+        )}
       </div>
     </motion.div>
   );

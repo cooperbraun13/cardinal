@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-/** Color-coded utilization bar: green <10%, amber <30%, orange <50%, red beyond. */
+/** Utilization bar — neutral white while healthy, cardinal red once it crosses 30%. */
 export function UtilizationBar({
   value,
   className,
@@ -11,18 +11,13 @@ export function UtilizationBar({
   trackClassName?: string;
 }) {
   const clamped = Math.min(100, Math.max(0, value));
-  const color =
-    clamped < 10
-      ? "bg-emerald-400"
-      : clamped < 30
-        ? "bg-amber-400"
-        : clamped < 50
-          ? "bg-orange-400"
-          : "bg-red-400";
   return (
-    <div className={cn("h-1.5 w-full overflow-hidden rounded-full bg-white/10", trackClassName, className)}>
+    <div className={cn("h-1 w-full overflow-hidden rounded-full bg-white/10", trackClassName, className)}>
       <div
-        className={cn("h-full rounded-full transition-all duration-500", color)}
+        className={cn(
+          "h-full rounded-full transition-all duration-500",
+          clamped >= 30 ? "bg-primary" : "bg-white/85"
+        )}
         style={{ width: `${clamped}%` }}
       />
     </div>

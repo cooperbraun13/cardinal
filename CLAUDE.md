@@ -1,4 +1,4 @@
-# CardPilot — Credit Card Tracker & Rewards Optimizer
+# Cardinal — Credit Card Tracker & Rewards Optimizer
 
 A polished full-stack web app for tracking credit cards: balances, utilization, statement/due dates, rewards, benefits, signup bonuses, transactions, and best-card-for-a-purchase recommendations. Should feel like a premium personal-finance product, not a CRUD dashboard — prioritize clean architecture, strong UX, reusable components, and realistic business logic.
 

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CreditCardIcon } from "lucide-react";
 import { apiFetch } from "@/lib/client";
 import { loginSchema, registerSchema } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
@@ -43,15 +42,16 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
-      <div className="mb-8 flex items-center gap-2.5">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600">
-          <CreditCardIcon className="size-5 text-white" />
-        </div>
-        <span className="text-2xl font-semibold tracking-tight">CardPilot</span>
+      <div className="mb-8 flex items-center gap-3">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/cardinal-logo.png" alt="" className="h-10 w-10 object-contain" />
+        <span className="text-2xl font-bold tracking-tight">Cardinal</span>
       </div>
-      <div className="glass w-full max-w-sm rounded-2xl border border-border p-6">
-        <h1 className="text-lg font-semibold">{isLogin ? "Welcome back" : "Create your account"}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+      <div className="w-full max-w-sm">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {isLogin ? "Welcome back" : "Create your account"}
+        </h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
           {isLogin
             ? "Log in to see your cards, rewards, and benefits."
             : "Track your cards, rewards, and always know which card to swipe."}
@@ -96,7 +96,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         <p className="mt-4 text-center text-xs text-muted-foreground">
           {isLogin ? (
             <>
-              New to CardPilot?{" "}
+              New to Cardinal?{" "}
               <Link href="/register" className="text-foreground underline underline-offset-2">
                 Create an account
               </Link>

@@ -111,14 +111,11 @@ export function CardsView({ cards }: { cards: CardListItem[] }) {
         </NativeSelect>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {visible.map((card) => (
           <CreditCardTile
             key={card.id}
-            card={{
-              ...card,
-              topCategories: card.rewardCategories,
-            }}
+            card={card}
             onClick={() => router.push(`/cards/${card.id}`)}
           />
         ))}

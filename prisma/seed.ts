@@ -1,5 +1,5 @@
 // Demo data seed: `npm run db:seed`
-// Login: demo@cardpilot.app / demo1234
+// Login: demo@cardinal.app / demo1234
 
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
@@ -41,7 +41,7 @@ const MERCHANTS: Record<string, string[]> = {
 };
 
 async function main() {
-  const email = "demo@cardpilot.app";
+  const email = "demo@cardinal.app";
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     console.log("Demo user already exists — deleting and reseeding.");
@@ -288,7 +288,7 @@ async function main() {
     });
   }
 
-  console.log("Seeded demo account: demo@cardpilot.app / demo1234");
+  console.log("Seeded demo account: demo@cardinal.app / demo1234");
 }
 
 main()

@@ -23,6 +23,7 @@
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+  --color-positive: var(--positive);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -117,32 +118,37 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* ---------- CardPilot premium dark theme overrides ---------- */
+/* ---------- Cardinal premium dark theme overrides ---------- */
 
+/* Cardinal design system — one accent (cardinal red #e5344e) on pure neutrals.
+   Near-black canvas, filled flat panels, Swiss grid, no glow, no shadows. */
 .dark {
-  --background: oklch(0.155 0.008 265);
-  --foreground: oklch(0.96 0.005 265);
-  --card: oklch(0.2 0.01 265);
-  --card-foreground: oklch(0.96 0.005 265);
-  --popover: oklch(0.21 0.01 265);
-  --popover-foreground: oklch(0.96 0.005 265);
-  --primary: oklch(0.93 0.005 265);
-  --primary-foreground: oklch(0.2 0.01 265);
-  --secondary: oklch(0.26 0.012 265);
-  --secondary-foreground: oklch(0.96 0.005 265);
-  --muted: oklch(0.25 0.01 265);
-  --muted-foreground: oklch(0.68 0.012 265);
-  --accent: oklch(0.27 0.015 265);
-  --accent-foreground: oklch(0.96 0.005 265);
-  --border: oklch(1 0 0 / 9%);
-  --input: oklch(1 0 0 / 13%);
-  --ring: oklch(0.55 0.02 265);
-  --radius: 0.8rem;
+  --background: oklch(0.145 0.002 260);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.19 0.002 260);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.21 0.002 260);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.586 0.2 16);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.24 0.002 260);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(0.23 0.002 260);
+  --muted-foreground: oklch(0.65 0.003 260);
+  --accent: oklch(0.24 0.002 260);
+  --accent-foreground: oklch(0.97 0 0);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.5 0.05 16);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.17 0.002 260);
+  --sidebar-foreground: oklch(0.97 0 0);
   --chart-1: oklch(0.62 0.17 275);
   --chart-2: oklch(0.72 0.15 165);
   --chart-3: oklch(0.8 0.14 85);
   --chart-4: oklch(0.66 0.18 15);
   --chart-5: oklch(0.75 0.12 220);
+  --positive: oklch(0.75 0.17 160);
 }
 
 @layer base {
@@ -157,43 +163,68 @@
   }
 }
 
-/* Credit card visual themes — pure CSS gradients, no card images. */
+/* Credit card visual themes — pure CSS, no card images.
+   Each theme layers a soft top-edge highlight and a corner glow over a deep
+   diagonal base gradient so cards read as lit objects, not flat fills. */
 .card-theme-midnight {
-  background: linear-gradient(135deg, #1c1f2e 0%, #2b2f45 55%, #3a3f63 100%);
+  background:
+    radial-gradient(130% 100% at 100% 0%, rgba(99, 116, 255, 0.10), transparent 55%),
+    linear-gradient(rgba(255, 255, 255, 0.06), transparent 38%),
+    linear-gradient(140deg, #0d0e14 0%, #171a26 48%, #232841 100%);
 }
 .card-theme-sapphire {
-  background: linear-gradient(135deg, #0f2a5c 0%, #1c4f9c 60%, #2e6fd0 100%);
+  background:
+    radial-gradient(130% 100% at 100% 0%, rgba(96, 190, 255, 0.10), transparent 55%),
+    linear-gradient(rgba(255, 255, 255, 0.07), transparent 38%),
+    linear-gradient(140deg, #081736 0%, #10306e 52%, #1d55b8 100%);
 }
 .card-theme-gold {
-  background: linear-gradient(135deg, #8a6a1f 0%, #c09a3e 55%, #e0bd6a 100%);
+  background:
+    radial-gradient(130% 100% at 100% 0%, rgba(255, 236, 170, 0.10), transparent 55%),
+    linear-gradient(rgba(255, 255, 255, 0.08), transparent 38%),
+    linear-gradient(140deg, #5c430e 0%, #97711f 50%, #cfa64a 100%);
 }
 .card-theme-emerald {
-  background: linear-gradient(135deg, #0d3d2e 0%, #14684d 60%, #1f9a72 100%);
+  background:
+    radial-gradient(130% 100% at 100% 0%, rgba(110, 255, 200, 0.10), transparent 55%),
+    linear-gradient(rgba(255, 255, 255, 0.06), transparent 38%),
+    linear-gradient(140deg, #04251b 0%, #0b4a35 52%, #12805a 100%);
 }
 .card-theme-ruby {
-  background: linear-gradient(135deg, #571124 0%, #8f1f3c 55%, #c23a5c 100%);
+  background:
+    radial-gradient(130% 100% at 100% 0%, rgba(255, 120, 150, 0.10), transparent 55%),
+    linear-gradient(rgba(255, 255, 255, 0.06), transparent 38%),
+    linear-gradient(140deg, #37081a 0%, #6e1231 52%, #a92049 100%);
 }
 .card-theme-slate {
-  background: linear-gradient(135deg, #23272e 0%, #3b4149 55%, #565e69 100%);
+  background:
+    radial-gradient(130% 100% at 100% 0%, rgba(200, 215, 235, 0.10), transparent 55%),
+    linear-gradient(rgba(255, 255, 255, 0.06), transparent 38%),
+    linear-gradient(140deg, #16181d 0%, #272b33 52%, #414854 100%);
 }
 .card-theme-violet {
-  background: linear-gradient(135deg, #34155c 0%, #582a94 55%, #7c47c9 100%);
+  background:
+    radial-gradient(130% 100% at 100% 0%, rgba(196, 140, 255, 0.10), transparent 55%),
+    linear-gradient(rgba(255, 255, 255, 0.06), transparent 38%),
+    linear-gradient(140deg, #1e0a3d 0%, #3d1a78 52%, #6430bd 100%);
 }
 .card-theme-copper {
-  background: linear-gradient(135deg, #4f2a17 0%, #86492a 55%, #b56a41 100%);
+  background:
+    radial-gradient(130% 100% at 100% 0%, rgba(255, 190, 140, 0.10), transparent 55%),
+    linear-gradient(rgba(255, 255, 255, 0.06), transparent 38%),
+    linear-gradient(140deg, #2e160a 0%, #63351c 52%, #9c5b34 100%);
 }
 
-/* Subtle glass surface for widgets layered over the background. */
-.glass {
-  background: color-mix(in oklab, var(--card) 78%, transparent);
-  backdrop-filter: blur(10px);
+
+
+/* Filled flat block — the one surface style. No border, no shadow. */
+.panel {
+  background: var(--card);
+  border-radius: calc(var(--radius) * 1.2);
 }
 
-/* Hide horizontal scrollbar on the card carousel while keeping scrollability. */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* Flat page section: hairline top divider, generous breathing room. */
+.section {
+  border-top: 1px solid var(--border);
+  padding-top: calc(var(--spacing) * 6);
 }

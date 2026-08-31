@@ -1,19 +1,7 @@
-"use client";
-
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from "recharts";
 import { categoryLabel } from "@/lib/categories";
 import { formatCurrency } from "@/lib/format";
-import { EmptyState } from "@/components/EmptyState";
-import { PieChartIcon } from "lucide-react";
 
-const COLORS = [
-  "var(--chart-1)",
-  "var(--chart-2)",
-  "var(--chart-3)",
-  "var(--chart-4)",
-  "var(--chart-5)",
-];
-
+/** Spending breakdown — label, proportional red bar, right-aligned amount. */
 export function SpendingCategoryChart({
   data,
 }: {
@@ -21,45 +9,28 @@ export function SpendingCategoryChart({
 }) {
   if (data.length === 0) {
     return (
-      <EmptyState
-        icon={PieChartIcon}
-        title="No spending yet this month"
-        description="Add transactions to see your spending broken down by category."
-      />
+      <p className="py-4 text-sm text-muted-foreground">
+        No spending yet this month. Add transactions to see the breakdown.
+      </p>
     );
   }
-  const chartData = data.slice(0, 6).map((d) => ({ ...d, label: categoryLabel(d.category) }));
+  const max = Math.max(...data.map((d) => d.amount));
   return (
-    <div className="h-64 w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData} layout="vertical" margin={{ left: 8, right: 16 }}>
-          <XAxis type="number" hide />
-          <YAxis
-            type="category"
-            dataKey="label"
-            width={110}
-            tickLine={false}
-            axisLine={false}
-            tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
-          />
-          <Tooltip
-            cursor={{ fill: "rgba(255,255,255,0.04)" }}
-            contentStyle={{
-              background: "var(--popover)",
-              border: "1px solid var(--border)",
-              borderRadius: 12,
-              color: "var(--foreground)",
-              fontSize: 12,
-            }}
-            formatter={(value) => [formatCurrency(Number(value)), "Spent"]}
-          />
-          <Bar dataKey="amount" radius={[4, 8, 8, 4]} barSize={18}>
-            {chartData.map((_, i) => (
-              <Cell key={i} fill={COLORS[i % COLORS.length]} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+    <div className="space-y-3.5">
+      {data.slice(0, 6).map((d) => (
+        <div key={d.category} className="grid grid-cols-[88px_1fr_auto] items-center gap-4">
+          <span className="truncate text-sm text-foreground/90">{categoryLabel(d.category)}</span>
+          <div className="h-1.5 overflow-hidden rounded-full">
+            <div
+              className="h-full rounded-full bg-primary"
+              style={{ width: `${Math.max(4, (d.amount / max) * 100)}%` }}
+            />
+          </div>
+          <span className="text-sm tabular-nums text-muted-foreground">
+            {formatCurrency(d.amount)}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }

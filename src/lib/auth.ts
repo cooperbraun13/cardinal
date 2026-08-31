@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import type { User } from "@prisma/client";
 
-const SESSION_COOKIE = "cardpilot_session";
+const SESSION_COOKIE = "cardinal_session";
 const SESSION_DAYS = 30;
 
 export async function hashPassword(password: string): Promise<string> {
