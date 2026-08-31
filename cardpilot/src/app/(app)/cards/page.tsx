@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { CardsView } from "@/components/CardsView";
 import { AddCardButton } from "@/components/AddButtons";
 
-export const metadata = { title: "Cards — CardPilot" };
+export const metadata = { title: "Cards — Cardinal" };
 
 export default async function CardsPage() {
   const user = await getCurrentUser();
@@ -19,7 +19,7 @@ export default async function CardsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Your cards</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Your cards</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
             {cards.length} active {cards.length === 1 ? "card" : "cards"}
           </p>

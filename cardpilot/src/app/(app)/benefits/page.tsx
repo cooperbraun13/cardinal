@@ -7,7 +7,7 @@ import { BenefitProgress } from "@/components/BenefitProgress";
 import { BenefitUsage } from "@/components/BenefitUsage";
 import { EmptyState } from "@/components/EmptyState";
 
-export const metadata = { title: "Benefits — CardPilot" };
+export const metadata = { title: "Benefits — Cardinal" };
 
 const STATUS_ORDER = ["expiring", "available", "partial", "used", "expired", "inactive"];
 
@@ -36,7 +36,7 @@ export default async function BenefitsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight">Benefits</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Benefits</h1>
         <p className="mt-0.5 text-sm text-muted-foreground">
           {views.length === 0
             ? "Track card credits and perks so they never expire unused."

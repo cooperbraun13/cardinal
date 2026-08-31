@@ -8,7 +8,7 @@ import { AddTransactionButton } from "@/components/AddButtons";
 import { Button } from "@/components/ui/button";
 import type { Prisma } from "@prisma/client";
 
-export const metadata = { title: "Transactions — CardPilot" };
+export const metadata = { title: "Transactions — Cardinal" };
 
 const PAGE_SIZE = 25;
 
@@ -72,7 +72,7 @@ export default async function TransactionsPage({ searchParams }: PageProps<"/tra
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Transactions</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
             {total} {total === 1 ? "transaction" : "transactions"}
           </p>
@@ -82,7 +82,7 @@ export default async function TransactionsPage({ searchParams }: PageProps<"/tra
 
       <TransactionFilters cards={cards} />
 
-      <div className="glass rounded-2xl border border-border px-4 py-1 sm:px-5">
+      <div className="border-t border-border">
         <TransactionTable transactions={transactions} allowDelete />
       </div>
 

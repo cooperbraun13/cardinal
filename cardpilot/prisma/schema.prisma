@@ -1,4 +1,4 @@
-// CardPilot data model — SQLite for local dev, kept Postgres-compatible.
+// Cardinal data model — SQLite for local dev, kept Postgres-compatible.
 // Money is stored as Float for MVP simplicity; migrate to integer cents or
 // Decimal when moving to Postgres.
 

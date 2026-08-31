@@ -19,12 +19,12 @@ export interface BenefitView {
 }
 
 const STATUS_BADGES: Record<BenefitStatus, { label: string; className: string }> = {
-  available: { label: "Available", className: "bg-emerald-500/15 text-emerald-400" },
-  partial: { label: "Partially used", className: "bg-sky-500/15 text-sky-400" },
-  used: { label: "Used", className: "bg-zinc-500/20 text-zinc-400" },
-  expiring: { label: "Expiring soon", className: "bg-amber-500/15 text-amber-400" },
-  expired: { label: "Expired", className: "bg-red-500/15 text-red-400" },
-  inactive: { label: "Inactive", className: "bg-zinc-500/20 text-zinc-400" },
+  available: { label: "Available", className: "bg-white/8 text-foreground" },
+  partial: { label: "Partially used", className: "bg-white/8 text-foreground/80" },
+  used: { label: "Used", className: "bg-white/6 text-muted-foreground" },
+  expiring: { label: "Expiring soon", className: "bg-primary/15 text-primary" },
+  expired: { label: "Expired", className: "bg-primary/15 text-primary" },
+  inactive: { label: "Inactive", className: "bg-white/6 text-muted-foreground" },
 };
 
 const FREQUENCY_LABELS: Record<string, string> = {
@@ -45,7 +45,7 @@ export function BenefitProgress({
   const badge = STATUS_BADGES[benefit.status];
   const pct = benefit.totalValue > 0 ? (benefit.usedValue / benefit.totalValue) * 100 : 0;
   return (
-    <div className="glass rounded-2xl border border-border p-4">
+    <div className="panel p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{benefit.name}</p>

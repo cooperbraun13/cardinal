@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { SparklesIcon } from "lucide-react";
 import { apiFetch } from "@/lib/client";
 import { CATEGORIES, categoryLabel } from "@/lib/categories";
 import { formatNumber, formatCurrency, formatRewardType } from "@/lib/format";
@@ -49,11 +48,8 @@ export function BestCardWidget() {
   }
 
   return (
-    <div className="glass rounded-2xl border border-border p-4">
-      <div className="flex items-center gap-2">
-        <SparklesIcon className="size-4 text-chart-1" />
-        <h3 className="text-sm font-semibold">Best card to use</h3>
-      </div>
+    <div className="panel p-5">
+      <h3 className="text-base font-bold tracking-tight">Best card to use</h3>
       <div className="mt-3 flex gap-2">
         <NativeSelect
           value={category}
@@ -90,7 +86,7 @@ export function BestCardWidget() {
         (result.recommendation ? (
           <div className="mt-3 rounded-xl bg-white/5 p-3">
             <p className="text-sm font-semibold">{result.recommendation.cardName}</p>
-            <p className="mt-0.5 text-xs text-emerald-400">
+            <p className="mt-0.5 text-xs font-semibold text-primary">
               +{formatEstimate(result.recommendation)}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">

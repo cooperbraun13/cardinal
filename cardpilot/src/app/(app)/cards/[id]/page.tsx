@@ -18,7 +18,7 @@ import {
 } from "@/components/CardDetailActions";
 import { AddTransactionButton } from "@/components/AddButtons";
 
-export const metadata = { title: "Card details — CardPilot" };
+export const metadata = { title: "Card details — Cardinal" };
 
 export default async function CardDetailPage({ params }: PageProps<"/cards/[id]">) {
   const user = await getCurrentUser();
@@ -60,16 +60,11 @@ export default async function CardDetailPage({ params }: PageProps<"/cards/[id]"
   return (
     <div className="space-y-8">
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(280px,380px)_1fr]">
-        <CreditCardTile
-          card={{
-            ...card,
-            topCategories: card.rewardCategories,
-          }}
-        />
+        <CreditCardTile card={card} />
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h1 className="text-xl font-semibold tracking-tight">{card.name}</h1>
+              <h1 className="text-2xl font-semibold tracking-tight">{card.name}</h1>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 {card.issuer}
                 {card.openedAt ? ` · Opened ${formatDate(card.openedAt)}` : ""}
@@ -98,7 +93,7 @@ export default async function CardDetailPage({ params }: PageProps<"/cards/[id]"
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-border pt-4 sm:grid-cols-4">
             <StatCard label="Balance" value={formatCurrency(card.currentBalance)} />
             <StatCard
               label="Utilization"
@@ -123,17 +118,17 @@ export default async function CardDetailPage({ params }: PageProps<"/cards/[id]"
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="glass rounded-2xl border border-border p-4 sm:p-5">
-          <h2 className="text-sm font-semibold">Recent transactions</h2>
+        <section className="section">
+          <h2 className="text-lg font-semibold tracking-tight">Recent transactions</h2>
           <div className="mt-2">
             <TransactionTable transactions={card.transactions} showCard={false} allowDelete />
           </div>
         </section>
 
         <div className="space-y-6">
-          <section>
+          <section className="section">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold">Benefits</h2>
+              <h2 className="text-lg font-semibold tracking-tight">Benefits</h2>
               <AddBenefitButton cardId={card.id} />
             </div>
             <div className="grid gap-3">
@@ -157,9 +152,9 @@ export default async function CardDetailPage({ params }: PageProps<"/cards/[id]"
             </div>
           </section>
 
-          <section>
+          <section className="section">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold">Signup bonus</h2>
+              <h2 className="text-lg font-semibold tracking-tight">Signup bonus</h2>
               <SetBonusButton
                 cardId={card.id}
                 initial={

@@ -149,8 +149,9 @@ export async function getBonusesWithProgress(userId: string) {
 export async function getDashboardData(userId: string) {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-  const [cards, monthRewards, monthSpendByCategory, recentTransactions, benefits, bonuses] =
+  const [cards, monthRewards, monthSpendByCategory, prevMonthSpend, recentTransactions, benefits, bonuses] =
     await Promise.all([
       prisma.card.findMany({
         where: { userId, active: true },
@@ -165,6 +166,15 @@ export async function getDashboardData(userId: string) {
       prisma.transaction.groupBy({
         by: ["category"],
         where: { userId, status: "posted", isRefund: false, transactionDate: { gte: monthStart } },
+        _sum: { amount: true },
+      }),
+      prisma.transaction.aggregate({
+        where: {
+          userId,
+          status: "posted",
+          isRefund: false,
+          transactionDate: { gte: prevMonthStart, lt: monthStart },
+        },
         _sum: { amount: true },
       }),
       prisma.transaction.findMany({
@@ -193,6 +203,12 @@ export async function getDashboardData(userId: string) {
   const pointsThisMonth = monthRewards
     .filter((r) => r.rewardType !== "cashback")
     .reduce((sum, r) => sum + (r._sum.rewardAmount ?? 0), 0);
+
+  const spendThisMonth = monthSpendByCategory.reduce((s, c) => s + (c._sum.amount ?? 0), 0);
+  const spendLastMonth = prevMonthSpend._sum.amount ?? 0;
+  // Month-over-month spend delta %; null when there's no prior month to compare.
+  const spendDeltaPct =
+    spendLastMonth > 0 ? ((spendThisMonth - spendLastMonth) / spendLastMonth) * 100 : null;
 
   const upcomingDueDates = cards
     .map((c) => ({
@@ -226,6 +242,8 @@ export async function getDashboardData(userId: string) {
       overallUtilization: overallUtilization(cards),
       rewardsValueThisMonth,
       pointsThisMonth,
+      spendThisMonth,
+      spendDeltaPct,
     },
     spendingByCategory: monthSpendByCategory
       .map((s) => ({ category: s.category, amount: s._sum.amount ?? 0 }))

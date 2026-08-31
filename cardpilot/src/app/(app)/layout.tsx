@@ -1,14 +1,16 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { AppNav } from "@/components/AppNav";
+import { Sidebar } from "@/components/Sidebar";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   return (
-    <div className="min-h-screen">
-      <AppNav userName={user.name} />
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">{children}</main>
+    <div className="flex min-h-screen flex-col md:flex-row">
+      <Sidebar userName={user.name} />
+      <main className="min-w-0 flex-1">
+        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-8 sm:py-10">{children}</div>
+      </main>
     </div>
   );
 }

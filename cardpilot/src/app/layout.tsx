@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CardPilot",
+  title: "Cardinal",
   description: "Track your credit cards, rewards, and benefits — and always know which card to swipe.",
 };
 
