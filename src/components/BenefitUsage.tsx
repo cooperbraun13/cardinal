@@ -45,9 +45,15 @@ export function BenefitUsage({
   }
 
   return (
-    <div className="mt-3 border-t border-border/60 pt-3">
+    <div className="mt-5 border-t border-border pt-4">
       {error && <ErrorBanner message={error} className="mb-2" />}
-      <div className="flex gap-2">
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          log();
+        }}
+        className="flex flex-wrap gap-2"
+      >
         <Input
           type="number"
           min="0.01"
@@ -55,23 +61,23 @@ export function BenefitUsage({
           placeholder="Amount used ($)"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="h-8 flex-1 text-xs"
+          className="min-w-32 flex-1 text-xs"
         />
-        <Button size="sm" className="h-8" onClick={() => log()} disabled={pending}>
+        <Button type="submit" size="sm" disabled={pending}>
           Log use
         </Button>
         {usedValue > 0 && (
           <Button
             size="sm"
             variant="ghost"
-            className="h-8 text-muted-foreground"
+            type="button"
             onClick={() => log(true)}
             disabled={pending}
           >
             Reset
           </Button>
         )}
-      </div>
+      </form>
     </div>
   );
 }

@@ -5,14 +5,14 @@ import { TrophyIcon } from "lucide-react";
 import { apiFetch } from "@/lib/client";
 import { CATEGORIES, categoryLabel } from "@/lib/categories";
 import { formatCurrency } from "@/lib/format";
+import type { Recommendation } from "@/services/recommend";
+import { formatEstimate } from "@/components/BestCardWidget";
+import { ErrorBanner } from "@/components/ErrorBanner";
+import { Field } from "@/components/forms/Field";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Field } from "@/components/forms/Field";
-import { ErrorBanner } from "@/components/ErrorBanner";
-import { formatEstimate } from "@/components/BestCardWidget";
-import type { Recommendation } from "@/services/recommend";
 import { cn } from "@/lib/utils";
 
 interface RecommendResponse {
@@ -30,38 +30,41 @@ export function OptimizerView() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function recommend(e: React.FormEvent) {
-    e.preventDefault();
+  async function recommend(event: React.FormEvent) {
+    event.preventDefault();
     setError("");
     setLoading(true);
     try {
-      const res = await apiFetch<RecommendResponse>("/api/recommend-card", {
+      const response = await apiFetch<RecommendResponse>("/api/recommend-card", {
         method: "POST",
         body: { category, amount: Number(amount), merchant: merchant || undefined },
       });
-      setResult(res);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setResult(response);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Something went wrong.");
     } finally {
       setLoading(false);
     }
   }
 
-  const all = result?.recommendation
-    ? [result.recommendation, ...result.alternatives]
+  const ranked = result?.recommendation
+    ? [result.recommendation, ...result.alternatives].slice(0, 4)
     : [];
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-      <form onSubmit={recommend} className="panel h-fit p-5">
-        <h2 className="text-base font-bold tracking-tight">Plan a purchase</h2>
-        <div className="mt-4 grid gap-3.5">
+    <div className="grid items-start gap-5 xl:grid-cols-[22rem_minmax(0,1fr)]">
+      <form onSubmit={recommend} className="panel p-5 sm:p-6 xl:sticky xl:top-6">
+        <h2 className="text-base font-semibold tracking-[-0.02em]">Plan a purchase</h2>
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+          Enter a category and amount to compare reward value.
+        </p>
+        <div className="mt-5 grid gap-4">
           {error && <ErrorBanner message={error} />}
           <Field label="Category">
-            <NativeSelect value={category} onChange={(e) => setCategory(e.target.value)}>
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {categoryLabel(c)}
+            <NativeSelect value={category} onChange={(event) => setCategory(event.target.value)}>
+              {CATEGORIES.map((purchaseCategory) => (
+                <option key={purchaseCategory} value={purchaseCategory}>
+                  {categoryLabel(purchaseCategory)}
                 </option>
               ))}
             </NativeSelect>
@@ -72,73 +75,92 @@ export function OptimizerView() {
               min="0.01"
               step="0.01"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(event) => setAmount(event.target.value)}
               required
             />
           </Field>
           <Field label="Merchant (optional)">
             <Input
               value={merchant}
-              onChange={(e) => setMerchant(e.target.value)}
+              onChange={(event) => setMerchant(event.target.value)}
               placeholder="Whole Foods"
             />
           </Field>
           <Button type="submit" disabled={loading || !amount || Number(amount) <= 0}>
-            {loading ? "Comparing cards…" : "Find the best card"}
+            {loading ? "Comparing cards..." : "Find the best card"}
           </Button>
         </div>
       </form>
 
-      <div>
+      <section aria-live="polite" aria-label="Card recommendations">
         {!result && (
-          <div className="flex h-full min-h-48 items-center justify-center rounded-2xl border border-dashed border-border p-8 text-center">
-            <p className="max-w-sm text-sm text-muted-foreground">
-              Tell Cardinal what you're buying, and it will rank your cards by estimated reward
-              value — accounting for promos, caps, and reward types.
-            </p>
+          <div className="panel flex min-h-64 items-center justify-center p-8 text-center">
+            <div className="max-w-md">
+              <p className="eyebrow">Ready when you are</p>
+              <h2 className="mt-3 text-xl font-semibold tracking-[-0.03em]">
+                Make every purchase work harder.
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                Cardinal ranks your cards using category rates, active promotions, spending caps,
+                and the estimated value of each reward type.
+              </p>
+            </div>
           </div>
         )}
+
         {result && !result.recommendation && (
-          <div className="flex h-full min-h-48 items-center justify-center rounded-2xl border border-dashed border-border p-8">
+          <div className="panel flex min-h-48 items-center justify-center p-8 text-center">
             <p className="text-sm text-muted-foreground">{result.message}</p>
           </div>
         )}
-        {all.length > 0 && (
-          <div className="space-y-3">
-            {all.slice(0, 4).map((rec, i) => (
-              <div
-                key={rec.cardId}
-                className={cn("panel p-4", i === 0 && "ring-1 ring-primary/50")}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      {i === 0 && <TrophyIcon className="size-4 shrink-0 text-primary" />}
-                      <p className="truncate text-sm font-semibold">{rec.cardName}</p>
-                      {rec.promo && (
-                        <Badge className="bg-primary/15 text-primary">Promo</Badge>
-                      )}
-                      {rec.capped && (
-                        <Badge variant="secondary">Cap reached</Badge>
-                      )}
+
+        {ranked.length > 0 && (
+          <div className="panel overflow-hidden">
+            <div className="border-b border-border px-5 py-4 sm:px-6">
+              <p className="text-sm font-semibold">Ranked recommendations</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Estimated for a {formatCurrency(Number(amount))} {categoryLabel(category).toLowerCase()} purchase.
+              </p>
+            </div>
+            <ol className="divide-y divide-border">
+              {ranked.map((recommendation, index) => (
+                <li
+                  key={recommendation.cardId}
+                  className={cn("p-5 sm:p-6", index === 0 && "bg-primary/[0.045]")}
+                >
+                  <div className="flex items-start justify-between gap-5">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-semibold tabular-nums text-muted-foreground">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        {index === 0 && <TrophyIcon className="size-4 text-primary" />}
+                        <p className="font-semibold">{recommendation.cardName}</p>
+                        {recommendation.promo && (
+                          <Badge className="border-primary/30 bg-primary/10 text-primary">Promo</Badge>
+                        )}
+                        {recommendation.capped && <Badge variant="outline">Cap reached</Badge>}
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">{recommendation.issuer}</p>
+                      <p className="mt-3 max-w-xl text-xs leading-5 text-muted-foreground">
+                        {recommendation.explanation}
+                      </p>
                     </div>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{rec.issuer}</p>
-                    <p className="mt-2 text-xs text-muted-foreground">{rec.explanation}</p>
+                    <div className="shrink-0 text-right">
+                      <p className="text-base font-semibold text-primary">
+                        +{formatEstimate(recommendation)}
+                      </p>
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        approx. {formatCurrency(recommendation.estimatedValue)} value
+                      </p>
+                    </div>
                   </div>
-                  <div className="shrink-0 text-right">
-                    <p className="text-sm font-semibold text-primary">
-                      +{formatEstimate(rec)}
-                    </p>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">
-                      ≈ {formatCurrency(rec.estimatedValue)} value
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
+                </li>
+              ))}
+            </ol>
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }

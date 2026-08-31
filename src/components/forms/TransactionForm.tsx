@@ -3,20 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/client";
-import { transactionSchema } from "@/lib/validation";
 import { CATEGORIES, categoryLabel } from "@/lib/categories";
-import { Button } from "@/components/ui/button";
+import { transactionSchema } from "@/lib/validation";
+import { ErrorBanner } from "@/components/ErrorBanner";
+import { Field } from "@/components/forms/Field";
+import { FormActions } from "@/components/forms/FormActions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Field } from "@/components/forms/Field";
-import { ErrorBanner } from "@/components/ErrorBanner";
 
 export function TransactionForm({
   open,
@@ -44,26 +38,26 @@ export function TransactionForm({
   const [pending, setPending] = useState(false);
 
   function set<K extends keyof typeof values>(key: K, value: (typeof values)[K]) {
-    setValues((v) => ({ ...v, [key]: value }));
+    setValues((current) => ({ ...current, [key]: value }));
   }
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
     setError("");
     const parsed = transactionSchema.safeParse(values);
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
       return;
     }
-    // Disabled-while-pending prevents rapid double-submits (practice ticket 10).
+
     setPending(true);
     try {
       await apiFetch("/api/transactions", { method: "POST", body: parsed.data });
       onOpenChange(false);
-      setValues((v) => ({ ...v, merchant: "", amount: "", isRefund: false }));
+      setValues((current) => ({ ...current, merchant: "", amount: "", isRefund: false }));
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Something went wrong.");
     } finally {
       setPending(false);
     }
@@ -75,26 +69,26 @@ export function TransactionForm({
         <DialogHeader>
           <DialogTitle>Add transaction</DialogTitle>
         </DialogHeader>
-        <form onSubmit={submit} className="grid gap-3">
+        <form onSubmit={submit} className="grid gap-4">
           {error && <ErrorBanner message={error} />}
           <Field label="Card">
             <NativeSelect
               value={values.cardId}
-              onChange={(e) => set("cardId", e.target.value)}
+              onChange={(event) => set("cardId", event.target.value)}
               required
             >
-              {cards.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
+              {cards.map((card) => (
+                <option key={card.id} value={card.id}>
+                  {card.name}
                 </option>
               ))}
             </NativeSelect>
           </Field>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Merchant">
               <Input
                 value={values.merchant}
-                onChange={(e) => set("merchant", e.target.value)}
+                onChange={(event) => set("merchant", event.target.value)}
                 placeholder="Blue Bottle Coffee"
                 required
               />
@@ -105,18 +99,18 @@ export function TransactionForm({
                 min="0.01"
                 step="0.01"
                 value={values.amount}
-                onChange={(e) => set("amount", e.target.value)}
+                onChange={(event) => set("amount", event.target.value)}
                 required
               />
             </Field>
             <Field label="Category">
               <NativeSelect
                 value={values.category}
-                onChange={(e) => set("category", e.target.value)}
+                onChange={(event) => set("category", event.target.value)}
               >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {categoryLabel(c)}
+                {CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {categoryLabel(category)}
                   </option>
                 ))}
               </NativeSelect>
@@ -125,12 +119,15 @@ export function TransactionForm({
               <Input
                 type="date"
                 value={values.transactionDate}
-                onChange={(e) => set("transactionDate", e.target.value)}
+                onChange={(event) => set("transactionDate", event.target.value)}
                 required
               />
             </Field>
             <Field label="Status">
-              <NativeSelect value={values.status} onChange={(e) => set("status", e.target.value)}>
+              <NativeSelect
+                value={values.status}
+                onChange={(event) => set("status", event.target.value)}
+              >
                 <option value="posted">Posted</option>
                 <option value="pending">Pending</option>
               </NativeSelect>
@@ -138,21 +135,20 @@ export function TransactionForm({
             <Field label="Type">
               <NativeSelect
                 value={values.isRefund ? "refund" : "purchase"}
-                onChange={(e) => set("isRefund", e.target.value === "refund")}
+                onChange={(event) => set("isRefund", event.target.value === "refund")}
               >
                 <option value="purchase">Purchase</option>
                 <option value="refund">Refund</option>
               </NativeSelect>
             </Field>
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={pending || cards.length === 0}>
-              {pending ? "Adding…" : "Add transaction"}
-            </Button>
-          </DialogFooter>
+          <FormActions
+            onCancel={() => onOpenChange(false)}
+            pending={pending}
+            disabled={cards.length === 0}
+            submitLabel="Add transaction"
+            pendingLabel="Adding..."
+          />
         </form>
       </DialogContent>
     </Dialog>

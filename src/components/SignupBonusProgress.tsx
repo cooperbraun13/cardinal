@@ -1,4 +1,4 @@
-import { formatCurrency, formatNumber, formatDate, daysUntil, formatRewardType } from "@/lib/format";
+import { daysUntil, formatCurrency, formatDate, formatNumber, formatRewardType } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
@@ -14,44 +14,38 @@ export interface BonusWithProgress {
   card: { name: string };
 }
 
-export function SignupBonusProgress({
-  bonus,
-  flat = false,
-}: {
-  bonus: BonusWithProgress;
-  /** true when rendered inside an existing panel — skips its own surface. */
-  flat?: boolean;
-}) {
+export function SignupBonusProgress({ bonus }: { bonus: BonusWithProgress }) {
   const days = daysUntil(bonus.deadline);
   const expired = days < 0 && !bonus.met;
+
   return (
-    <div className={flat ? "" : "panel p-4"}>
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <p className="text-sm font-medium">{bonus.card.name}</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
+    <article className="panel p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold">{bonus.card.name}</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
             Earn {formatNumber(bonus.rewardAmount)} {formatRewardType(bonus.rewardType)} after{" "}
-            {formatCurrency(bonus.spendRequirement, { compact: true })} spend
+            {formatCurrency(bonus.spendRequirement, { compact: true })} in eligible spend.
           </p>
         </div>
         {bonus.met ? (
-          <Badge variant="secondary">Earned</Badge>
+          <Badge variant="outline">Earned</Badge>
         ) : expired ? (
-          <Badge className="bg-primary/15 text-primary">Expired</Badge>
+          <Badge className="border-destructive/30 bg-destructive/10 text-destructive">Expired</Badge>
         ) : (
-          <Badge variant="secondary">{days}d left</Badge>
+          <Badge className="border-primary/30 bg-primary/10 text-primary">{days}d left</Badge>
         )}
       </div>
-      <div className="mt-3 flex items-center gap-3">
-        <Progress value={bonus.progress} className="h-2 flex-1" />
-        <span className="text-xs font-medium tabular-nums text-muted-foreground">
+      <div className="mt-5 flex items-center gap-3">
+        <Progress value={bonus.progress} className="flex-1" />
+        <span className="text-xs font-semibold tabular-nums text-muted-foreground">
           {bonus.progress.toFixed(0)}%
         </span>
       </div>
-      <p className="mt-1.5 text-xs text-muted-foreground">
-        {formatCurrency(bonus.eligibleSpend)} of {formatCurrency(bonus.spendRequirement)} · by{" "}
+      <p className="mt-3 text-xs leading-5 text-muted-foreground">
+        {formatCurrency(bonus.eligibleSpend)} of {formatCurrency(bonus.spendRequirement)} / due{" "}
         {formatDate(bonus.deadline)}
       </p>
-    </div>
+    </article>
   );
 }

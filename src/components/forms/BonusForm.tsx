@@ -3,20 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/client";
-import { signupBonusSchema } from "@/lib/validation";
 import { REWARD_TYPES } from "@/lib/categories";
-import { Button } from "@/components/ui/button";
+import { signupBonusSchema } from "@/lib/validation";
+import { ErrorBanner } from "@/components/ErrorBanner";
+import { Field } from "@/components/forms/Field";
+import { FormActions } from "@/components/forms/FormActions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Field } from "@/components/forms/Field";
-import { ErrorBanner } from "@/components/ErrorBanner";
 
 export function BonusForm({
   open,
@@ -31,7 +25,7 @@ export function BonusForm({
     spendRequirement: number;
     rewardAmount: number;
     rewardType: string;
-    deadline: string; // yyyy-mm-dd
+    deadline: string;
   };
 }) {
   const router = useRouter();
@@ -45,24 +39,28 @@ export function BonusForm({
   const [pending, setPending] = useState(false);
 
   function set<K extends keyof typeof values>(key: K, value: string) {
-    setValues((v) => ({ ...v, [key]: value }));
+    setValues((current) => ({ ...current, [key]: value }));
   }
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
     setError("");
     const parsed = signupBonusSchema.safeParse(values);
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
       return;
     }
+
     setPending(true);
     try {
-      await apiFetch(`/api/cards/${cardId}/signup-bonus`, { method: "POST", body: parsed.data });
+      await apiFetch(`/api/cards/${cardId}/signup-bonus`, {
+        method: "POST",
+        body: parsed.data,
+      });
       onOpenChange(false);
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Something went wrong.");
     } finally {
       setPending(false);
     }
@@ -74,16 +72,16 @@ export function BonusForm({
         <DialogHeader>
           <DialogTitle>{initial ? "Edit signup bonus" : "Set signup bonus"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={submit} className="grid gap-3">
+        <form onSubmit={submit} className="grid gap-4">
           {error && <ErrorBanner message={error} />}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Spend requirement ($)">
               <Input
                 type="number"
                 min="1"
                 step="1"
                 value={values.spendRequirement}
-                onChange={(e) => set("spendRequirement", e.target.value)}
+                onChange={(event) => set("spendRequirement", event.target.value)}
                 placeholder="4000"
                 required
               />
@@ -94,7 +92,7 @@ export function BonusForm({
                 min="1"
                 step="1"
                 value={values.rewardAmount}
-                onChange={(e) => set("rewardAmount", e.target.value)}
+                onChange={(event) => set("rewardAmount", event.target.value)}
                 placeholder="60000"
                 required
               />
@@ -102,11 +100,11 @@ export function BonusForm({
             <Field label="Reward type">
               <NativeSelect
                 value={values.rewardType}
-                onChange={(e) => set("rewardType", e.target.value)}
+                onChange={(event) => set("rewardType", event.target.value)}
               >
-                {REWARD_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t === "cashback" ? "Cash back" : t[0].toUpperCase() + t.slice(1)}
+                {REWARD_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type === "cashback" ? "Cash back" : type[0].toUpperCase() + type.slice(1)}
                   </option>
                 ))}
               </NativeSelect>
@@ -115,19 +113,16 @@ export function BonusForm({
               <Input
                 type="date"
                 value={values.deadline}
-                onChange={(e) => set("deadline", e.target.value)}
+                onChange={(event) => set("deadline", event.target.value)}
                 required
               />
             </Field>
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={pending}>
-              {pending ? "Saving…" : "Save bonus"}
-            </Button>
-          </DialogFooter>
+          <FormActions
+            onCancel={() => onOpenChange(false)}
+            pending={pending}
+            submitLabel="Save bonus"
+          />
         </form>
       </DialogContent>
     </Dialog>
