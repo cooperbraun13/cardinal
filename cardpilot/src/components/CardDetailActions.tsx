@@ -121,7 +121,7 @@ export function RewardRules({ cardId, rules }: { cardId: string; rules: RuleView
             </button>
           </Badge>
         ))}
-        <Button variant="outline" size="sm" className="h-7" onClick={() => setAddOpen(true)}>
+        <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
           <PlusIcon className="size-3.5" /> Rule
         </Button>
       </div>
@@ -134,7 +134,7 @@ export function AddBenefitButton({ cardId }: { cardId: string }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="outline" size="sm" className="h-7" onClick={() => setOpen(true)}>
+      <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
         <PlusIcon className="size-3.5" /> Benefit
       </Button>
       <BenefitForm open={open} onOpenChange={setOpen} cardId={cardId} />
@@ -152,7 +152,7 @@ export function SetBonusButton({
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="outline" size="sm" className="h-7" onClick={() => setOpen(true)}>
+      <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
         {initial ? <PencilIcon className="size-3.5" /> : <PlusIcon className="size-3.5" />}
         {initial ? "Edit bonus" : "Bonus"}
       </Button>

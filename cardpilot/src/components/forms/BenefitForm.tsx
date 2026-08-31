@@ -3,22 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/client";
+import {
+  BENEFIT_TYPES,
+  BENEFIT_TYPE_LABELS,
+  RESET_FREQUENCIES,
+} from "@/lib/categories";
 import { benefitSchema } from "@/lib/validation";
-import { BENEFIT_TYPES, BENEFIT_TYPE_LABELS, RESET_FREQUENCIES } from "@/lib/categories";
-import { Button } from "@/components/ui/button";
+import { ErrorBanner } from "@/components/ErrorBanner";
+import { Field } from "@/components/forms/Field";
+import { FormActions } from "@/components/forms/FormActions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Field } from "@/components/forms/Field";
-import { ErrorBanner } from "@/components/ErrorBanner";
 
-const FREQ_LABELS: Record<string, string> = {
+const FREQUENCY_LABELS: Record<string, string> = {
   monthly: "Monthly",
   quarterly: "Quarterly",
   semiannual: "Semiannual",
@@ -49,11 +47,11 @@ export function BenefitForm({
   const [pending, setPending] = useState(false);
 
   function set<K extends keyof typeof values>(key: K, value: string) {
-    setValues((v) => ({ ...v, [key]: value }));
+    setValues((current) => ({ ...current, [key]: value }));
   }
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
     setError("");
     const parsed = benefitSchema.safeParse({
       ...values,
@@ -63,14 +61,18 @@ export function BenefitForm({
       setError(parsed.error.issues[0].message);
       return;
     }
+
     setPending(true);
     try {
-      await apiFetch(`/api/cards/${cardId}/benefits`, { method: "POST", body: parsed.data });
+      await apiFetch(`/api/cards/${cardId}/benefits`, {
+        method: "POST",
+        body: parsed.data,
+      });
       onOpenChange(false);
-      setValues((v) => ({ ...v, name: "", totalValue: "" }));
+      setValues((current) => ({ ...current, name: "", totalValue: "" }));
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Something went wrong.");
     } finally {
       setPending(false);
     }
@@ -82,25 +84,25 @@ export function BenefitForm({
         <DialogHeader>
           <DialogTitle>Add benefit</DialogTitle>
         </DialogHeader>
-        <form onSubmit={submit} className="grid gap-3">
+        <form onSubmit={submit} className="grid gap-4">
           {error && <ErrorBanner message={error} />}
           <Field label="Benefit name">
             <Input
               value={values.name}
-              onChange={(e) => set("name", e.target.value)}
-              placeholder="$120 Dining Credit"
+              onChange={(event) => set("name", event.target.value)}
+              placeholder="$120 dining credit"
               required
             />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Type">
               <NativeSelect
                 value={values.benefitType}
-                onChange={(e) => set("benefitType", e.target.value)}
+                onChange={(event) => set("benefitType", event.target.value)}
               >
-                {BENEFIT_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {BENEFIT_TYPE_LABELS[t]}
+                {BENEFIT_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {BENEFIT_TYPE_LABELS[type]}
                   </option>
                 ))}
               </NativeSelect>
@@ -111,18 +113,18 @@ export function BenefitForm({
                 min="0.01"
                 step="0.01"
                 value={values.totalValue}
-                onChange={(e) => set("totalValue", e.target.value)}
+                onChange={(event) => set("totalValue", event.target.value)}
                 required
               />
             </Field>
             <Field label="Resets">
               <NativeSelect
                 value={values.resetFrequency}
-                onChange={(e) => set("resetFrequency", e.target.value)}
+                onChange={(event) => set("resetFrequency", event.target.value)}
               >
-                {RESET_FREQUENCIES.map((f) => (
-                  <option key={f} value={f}>
-                    {FREQ_LABELS[f]}
+                {RESET_FREQUENCIES.map((frequency) => (
+                  <option key={frequency} value={frequency}>
+                    {FREQUENCY_LABELS[frequency]}
                   </option>
                 ))}
               </NativeSelect>
@@ -131,26 +133,24 @@ export function BenefitForm({
               <Input
                 type="date"
                 value={values.startDate}
-                onChange={(e) => set("startDate", e.target.value)}
+                onChange={(event) => set("startDate", event.target.value)}
                 required
               />
             </Field>
-            <Field label="Expires (optional)" className="col-span-2">
+            <Field label="Expires (optional)" className="sm:col-span-2">
               <Input
                 type="date"
                 value={values.expirationDate}
-                onChange={(e) => set("expirationDate", e.target.value)}
+                onChange={(event) => set("expirationDate", event.target.value)}
               />
             </Field>
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={pending}>
-              {pending ? "Adding…" : "Add benefit"}
-            </Button>
-          </DialogFooter>
+          <FormActions
+            onCancel={() => onOpenChange(false)}
+            pending={pending}
+            submitLabel="Add benefit"
+            pendingLabel="Adding..."
+          />
         </form>
       </DialogContent>
     </Dialog>
