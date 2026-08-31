@@ -1,113 +1,115 @@
 "use client";
 
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SearchIcon, XIcon } from "lucide-react";
 import { CATEGORIES, categoryLabel } from "@/lib/categories";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 
-/** URL-driven filter bar — filters live in searchParams so results are shareable. */
 export function TransactionFilters({ cards }: { cards: { id: string; name: string }[] }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
-  const [search, setSearch] = useState(params.get("search") ?? "");
-
   function apply(updates: Record<string, string>) {
     const next = new URLSearchParams(params.toString());
     for (const [key, value] of Object.entries(updates)) {
       if (value) next.set(key, value);
       else next.delete(key);
     }
-    next.delete("page"); // filters reset pagination
-    router.push(`${pathname}?${next.toString()}`);
+    next.delete("page");
+    const query = next.toString();
+    router.push(query ? `${pathname}?${query}` : pathname);
   }
 
-  const hasFilters = ["search", "cardId", "category", "status", "from", "to"].some((k) =>
-    params.get(k)
+  const hasFilters = ["search", "cardId", "category", "status", "from", "to"].some((key) =>
+    params.has(key)
   );
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(12rem,1.4fr)_repeat(3,minmax(8rem,1fr))_9rem_9rem_auto]">
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          apply({ search });
+        onSubmit={(event) => {
+          event.preventDefault();
+          const form = new FormData(event.currentTarget);
+          apply({ search: String(form.get("search") ?? "") });
         }}
-        className="relative"
+        className="relative sm:col-span-2 xl:col-span-1"
       >
-        <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+        <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search merchant…"
-          className="w-48 pl-8"
+          key={params.get("search") ?? ""}
+          name="search"
+          defaultValue={params.get("search") ?? ""}
+          placeholder="Search merchant..."
+          className="pl-9"
           aria-label="Search merchant"
         />
       </form>
+
       <NativeSelect
         value={params.get("cardId") ?? ""}
-        onChange={(e) => apply({ cardId: e.target.value })}
+        onChange={(event) => apply({ cardId: event.target.value })}
         aria-label="Filter by card"
-        className="w-40"
+        wrapperClassName="w-full"
       >
         <option value="">All cards</option>
-        {cards.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
+        {cards.map((card) => (
+          <option key={card.id} value={card.id}>
+            {card.name}
           </option>
         ))}
       </NativeSelect>
+
       <NativeSelect
         value={params.get("category") ?? ""}
-        onChange={(e) => apply({ category: e.target.value })}
+        onChange={(event) => apply({ category: event.target.value })}
         aria-label="Filter by category"
-        className="w-40"
+        wrapperClassName="w-full"
       >
         <option value="">All categories</option>
-        {CATEGORIES.map((c) => (
-          <option key={c} value={c}>
-            {categoryLabel(c)}
+        {CATEGORIES.map((category) => (
+          <option key={category} value={category}>
+            {categoryLabel(category)}
           </option>
         ))}
       </NativeSelect>
+
       <NativeSelect
         value={params.get("status") ?? ""}
-        onChange={(e) => apply({ status: e.target.value })}
+        onChange={(event) => apply({ status: event.target.value })}
         aria-label="Filter by status"
-        className="w-32"
+        wrapperClassName="w-full"
       >
         <option value="">Any status</option>
         <option value="posted">Posted</option>
         <option value="pending">Pending</option>
       </NativeSelect>
+
       <Input
         type="date"
         value={params.get("from") ?? ""}
-        onChange={(e) => apply({ from: e.target.value })}
+        onChange={(event) => apply({ from: event.target.value })}
         aria-label="From date"
-        className="w-36"
       />
       <Input
         type="date"
         value={params.get("to") ?? ""}
-        onChange={(e) => apply({ to: e.target.value })}
+        onChange={(event) => apply({ to: event.target.value })}
         aria-label="To date"
-        className="w-36"
       />
+
       {hasFilters && (
         <Button
           variant="ghost"
           size="sm"
           onClick={() => {
-            setSearch("");
             router.push(pathname);
           }}
-          className="text-muted-foreground"
+          className="justify-self-start xl:justify-self-end"
         >
-          <XIcon className="size-3.5" /> Clear
+          <XIcon className="size-3.5" />
+          Clear
         </Button>
       )}
     </div>
