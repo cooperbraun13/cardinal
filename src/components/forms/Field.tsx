@@ -1,9 +1,9 @@
+"use client";
+
+import { cloneElement, isValidElement, useId } from "react";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
-let fieldId = 0;
-
-/** Label + control wrapper for form dialogs. */
 export function Field({
   label,
   children,
@@ -15,13 +15,18 @@ export function Field({
   className?: string;
   htmlFor?: string;
 }) {
-  const id = htmlFor ?? `field-${++fieldId}`;
+  const generatedId = useId();
+  const controlId = htmlFor ?? generatedId;
+  const control = isValidElement<{ id?: string }>(children)
+    ? cloneElement(children, { id: children.props.id ?? controlId })
+    : children;
+
   return (
-    <div className={cn("flex flex-col gap-1.5", className)}>
-      <Label htmlFor={id} className="text-xs text-muted-foreground">
+    <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
+      <Label htmlFor={controlId} className="text-xs font-medium text-muted-foreground">
         {label}
       </Label>
-      <div id={id}>{children}</div>
+      {control}
     </div>
   );
 }
