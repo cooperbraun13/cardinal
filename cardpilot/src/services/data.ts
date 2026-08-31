@@ -180,8 +180,11 @@ export async function getDashboardData(userId: string) {
       prisma.transaction.findMany({
         where: { userId },
         orderBy: { transactionDate: "desc" },
-        take: 8,
-        include: { card: { select: { name: true, cardTheme: true } } },
+        take: 6,
+        include: {
+          card: { select: { name: true, cardTheme: true } },
+          rewards: { select: { rewardAmount: true, rewardType: true, multiplier: true } },
+        },
       }),
       prisma.benefit.findMany({
         where: { card: { userId }, active: true },
