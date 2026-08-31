@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { CreditCardTile, type CreditCardTileData } from "@/components/CreditCardTile";
 import { NativeSelect } from "@/components/ui/native-select";
 import { EmptyState } from "@/components/EmptyState";
@@ -18,7 +18,6 @@ export interface CardListItem extends CreditCardTileData {
 type SortKey = "utilization" | "dueDate" | "annualFee" | "balance";
 
 export function CardsView({ cards }: { cards: CardListItem[] }) {
-  const router = useRouter();
   const [issuer, setIssuer] = useState("all");
   const [rewardType, setRewardType] = useState("all");
   const [sort, setSort] = useState<SortKey>("utilization");
@@ -70,13 +69,13 @@ export function CardsView({ cards }: { cards: CardListItem[] }) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="space-y-5">
+      <div className="panel grid gap-2 p-3 sm:grid-cols-3">
         <NativeSelect
           value={issuer}
           onChange={(e) => setIssuer(e.target.value)}
           aria-label="Filter by issuer"
-          className="w-40"
+          wrapperClassName="w-full"
         >
           <option value="all">All issuers</option>
           {issuers.map((i) => (
@@ -89,7 +88,7 @@ export function CardsView({ cards }: { cards: CardListItem[] }) {
           value={rewardType}
           onChange={(e) => setRewardType(e.target.value)}
           aria-label="Filter by reward category"
-          className="w-44"
+          wrapperClassName="w-full"
         >
           <option value="all">All reward types</option>
           {rewardCategories.map((c) => (
@@ -102,7 +101,7 @@ export function CardsView({ cards }: { cards: CardListItem[] }) {
           value={sort}
           onChange={(e) => setSort(e.target.value as SortKey)}
           aria-label="Sort cards"
-          className="w-44"
+          wrapperClassName="w-full"
         >
           <option value="utilization">Sort: Utilization</option>
           <option value="dueDate">Sort: Due date</option>
@@ -113,15 +112,18 @@ export function CardsView({ cards }: { cards: CardListItem[] }) {
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {visible.map((card) => (
-          <CreditCardTile
+          <Link
             key={card.id}
-            card={card}
-            onClick={() => router.push(`/cards/${card.id}`)}
-          />
+            href={`/cards/${card.id}`}
+            aria-label={`View ${card.name}`}
+            className="group rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+          >
+            <CreditCardTile card={card} />
+          </Link>
         ))}
       </div>
       {visible.length === 0 && (
-        <p className="py-8 text-center text-sm text-muted-foreground">
+        <p aria-live="polite" className="py-10 text-center text-sm text-muted-foreground">
           No cards match these filters.
         </p>
       )}
