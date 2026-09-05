@@ -60,10 +60,12 @@ export function CardForm({
   const [values, setValues] = useState<CardFormValues>(initial ?? EMPTY);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const [dirtyFields, setDirtyFields] = useState<Set<keyof CardFormValues>>(() => new Set());
   const isEdit = Boolean(initial?.id);
 
   function set<K extends keyof CardFormValues>(key: K, value: string) {
     setValues((current) => ({ ...current, [key]: value }));
+    setDirtyFields((current) => new Set(current).add(key));
   }
 
   async function submit(event: React.FormEvent) {
@@ -82,9 +84,9 @@ export function CardForm({
       openedAt: values.openedAt || null,
       cardTheme: values.cardTheme,
     };
-    // Edit only changed fields: a renamed card must not overwrite a newer balance.
+    // Send only fields the user touched; refreshed props must not turn stale values into edits.
     const changes = initial ? Object.fromEntries(Object.entries(input).filter(
-      ([key]) => values[key as keyof CardFormValues] !== initial[key as keyof CardFormValues]
+      ([key]) => dirtyFields.has(key as keyof CardFormValues)
     )) : input;
     const parsed = (isEdit ? cardUpdateSchema : cardSchema).safeParse(changes);
 
