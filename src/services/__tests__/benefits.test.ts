@@ -32,19 +32,19 @@ describe("benefitRemaining", () => {
 describe("currentPeriodEnd", () => {
   it("monthly resets at the start of next month", () => {
     expect(currentPeriodEnd(benefit({ resetFrequency: "monthly" }), now)).toEqual(
-      new Date(2026, 8, 1)
+      new Date("2026-09-01T00:00:00Z")
     );
   });
 
   it("quarterly resets at the next quarter boundary", () => {
     expect(currentPeriodEnd(benefit({ resetFrequency: "quarterly" }), now)).toEqual(
-      new Date(2026, 9, 1)
+      new Date("2026-10-01T00:00:00Z")
     );
   });
 
   it("annual resets at the start of next year", () => {
     expect(currentPeriodEnd(benefit({ resetFrequency: "annual" }), now)).toEqual(
-      new Date(2027, 0, 1)
+      new Date("2027-01-01T00:00:00Z")
     );
   });
 

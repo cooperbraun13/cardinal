@@ -1,5 +1,6 @@
 // Benefit period + status logic. Pure functions for testability.
-// All period math uses local calendar dates; timestamps are stored in UTC.
+// Financial periods use UTC calendar days consistently across server and browser.
+import { dayAfter, dayStart } from "@/lib/dates";
 
 export type BenefitStatus = "available" | "partial" | "used" | "expiring" | "expired" | "inactive";
 
@@ -16,17 +17,17 @@ export interface BenefitLike {
 export function currentPeriodEnd(benefit: BenefitLike, now: Date = new Date()): Date | null {
   switch (benefit.resetFrequency) {
     case "monthly":
-      return new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
     case "quarterly": {
-      const q = Math.floor(now.getMonth() / 3);
-      return new Date(now.getFullYear(), q * 3 + 3, 1);
+      const q = Math.floor(now.getUTCMonth() / 3);
+      return new Date(Date.UTC(now.getUTCFullYear(), q * 3 + 3, 1));
     }
     case "semiannual":
-      return now.getMonth() < 6
-        ? new Date(now.getFullYear(), 6, 1)
-        : new Date(now.getFullYear() + 1, 0, 1);
+      return now.getUTCMonth() < 6
+        ? new Date(Date.UTC(now.getUTCFullYear(), 6, 1))
+        : new Date(Date.UTC(now.getUTCFullYear() + 1, 0, 1));
     case "annual":
-      return new Date(now.getFullYear() + 1, 0, 1);
+      return new Date(Date.UTC(now.getUTCFullYear() + 1, 0, 1));
     case "one_time":
     default:
       return benefit.expirationDate;
@@ -49,8 +50,8 @@ export const EXPIRING_SOON_DAYS = 14;
 
 export function benefitStatus(benefit: BenefitLike, now: Date = new Date()): BenefitStatus {
   if (!benefit.active) return "inactive";
-  if (benefit.expirationDate && benefit.expirationDate < now) return "expired";
-  if (now < benefit.startDate) return "inactive";
+  if (benefit.expirationDate && now >= dayAfter(benefit.expirationDate)) return "expired";
+  if (now < dayStart(benefit.startDate)) return "inactive";
   const remaining = benefitRemaining(benefit);
   if (remaining <= 0) return "used";
   const expiry = effectiveExpiry(benefit, now);

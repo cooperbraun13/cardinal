@@ -1,6 +1,7 @@
 // Core reward math. Pure functions — no DB access — so they are trivially unit-testable.
 
 import { EVERYTHING } from "@/lib/categories";
+import { dayAfter, dayStart } from "@/lib/dates";
 
 export interface RewardRule {
   category: string;
@@ -27,8 +28,8 @@ export function overallUtilization(
 
 /** A rule is active if `date` falls within its (optional) start/end window. */
 export function isRuleActive(rule: RewardRule, date: Date): boolean {
-  if (rule.startDate && date < rule.startDate) return false;
-  if (rule.endDate && date > rule.endDate) return false;
+  if (rule.startDate && date < dayStart(rule.startDate)) return false;
+  if (rule.endDate && date >= dayAfter(rule.endDate)) return false;
   return true;
 }
 
