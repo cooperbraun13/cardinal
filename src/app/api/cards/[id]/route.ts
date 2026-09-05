@@ -20,7 +20,7 @@ export const PATCH = handleApi(async (req: Request, { params }: Params) => {
   const body = cardUpdateSchema.parse(await req.json());
   const card = await prisma.card.update({
     where: { id },
-    data: { ...body, openedAt: body.openedAt ? new Date(body.openedAt) : undefined },
+    data: { ...body, openedAt: body.openedAt === undefined ? undefined : body.openedAt ? new Date(body.openedAt) : null },
   });
   return NextResponse.json(card);
 });

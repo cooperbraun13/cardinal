@@ -11,7 +11,6 @@ import { ErrorBanner } from "@/components/ErrorBanner";
 export function BenefitUsage({
   benefitId,
   usedValue,
-  totalValue,
 }: {
   benefitId: string;
   usedValue: number;
@@ -33,7 +32,7 @@ export function BenefitUsage({
     try {
       await apiFetch(`/api/benefits/${benefitId}`, {
         method: "PATCH",
-        body: { usedValue: reset ? 0 : Math.min(totalValue, usedValue + delta) },
+        body: reset ? { usedValue: 0 } : { usageDelta: delta },
       });
       setAmount("");
       router.refresh();

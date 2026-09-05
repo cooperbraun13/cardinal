@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/client";
 import { CARD_THEMES, NETWORKS } from "@/lib/categories";
-import { cardSchema } from "@/lib/validation";
+import { cardSchema, cardUpdateSchema } from "@/lib/validation";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { Field } from "@/components/forms/Field";
 import { FormActions } from "@/components/forms/FormActions";
@@ -69,7 +69,7 @@ export function CardForm({
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     setError("");
-    const parsed = cardSchema.safeParse({
+    const input = {
       name: values.name,
       issuer: values.issuer,
       network: values.network || null,
@@ -81,7 +81,12 @@ export function CardForm({
       dueDay: values.dueDay,
       openedAt: values.openedAt || null,
       cardTheme: values.cardTheme,
-    });
+    };
+    // Edit only changed fields: a renamed card must not overwrite a newer balance.
+    const changes = initial ? Object.fromEntries(Object.entries(input).filter(
+      ([key]) => values[key as keyof CardFormValues] !== initial[key as keyof CardFormValues]
+    )) : input;
+    const parsed = (isEdit ? cardUpdateSchema : cardSchema).safeParse(changes);
 
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
@@ -90,7 +95,7 @@ export function CardForm({
 
     setPending(true);
     try {
-      await apiFetch(isEdit ? `/api/cards/${initial!.id}` : "/api/cards", {
+      await apiFetch(initial?.id ? `/api/cards/${initial.id}` : "/api/cards", {
         method: isEdit ? "PATCH" : "POST",
         body: parsed.data,
       });
@@ -165,7 +170,6 @@ export function CardForm({
             <Field label="Current balance ($)">
               <Input
                 type="number"
-                min="0"
                 step="0.01"
                 value={values.currentBalance}
                 onChange={(event) => set("currentBalance", event.target.value)}
