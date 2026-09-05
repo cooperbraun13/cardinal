@@ -33,6 +33,8 @@ describe("financial input validation", () => {
   });
   it("rejects backwards promotion windows", () => {
     expect(rewardCategorySchema.safeParse({ category: "dining", multiplier: 3, startDate: "2026-09-10", endDate: "2026-09-01" }).success).toBe(false);
+    expect(rewardCategorySchema.safeParse({ category: "dining", multiplier: 3,
+      startDate: "2026-09-05T23:00:00-07:00", endDate: "2026-09-05T00:00:00Z" }).success).toBe(false);
   });
   it("rejects benefit usage beyond total and backwards validity windows", () => {
     const benefit = { name: "Credit", benefitType: "dining_credit", totalValue: 10, resetFrequency: "monthly", startDate: "2026-09-05" };

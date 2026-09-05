@@ -8,6 +8,7 @@ import {
   NETWORKS,
   CARD_THEMES,
 } from "@/lib/categories";
+import { dayStart } from "@/lib/dates";
 
 // Shared between frontend forms and backend routes. Backend validation is the
 // source of truth; frontend reuses these for immediate feedback.
@@ -62,6 +63,9 @@ export const cardSchema = cardFields.extend({
 });
 export const cardUpdateSchema = cardFields.partial();
 
+const orderedDays = (start: string | null | undefined, end: string | null | undefined) =>
+  !start || !end || dayStart(start).getTime() <= dayStart(end).getTime();
+
 export const rewardCategorySchema = z.object({
   category: z.enum([...CATEGORIES, EVERYTHING] as [string, ...string[]]),
   multiplier: z.coerce.number().positive("Multiplier must be positive").max(100),
@@ -69,7 +73,7 @@ export const rewardCategorySchema = z.object({
   endDate: dateString.nullish(),
   spendingCap: positiveMoney.nullish(),
   notes: z.string().max(300).nullish(),
-}).refine((rule) => !rule.startDate || !rule.endDate || rule.startDate.slice(0, 10) <= rule.endDate.slice(0, 10), {
+}).refine((rule) => orderedDays(rule.startDate, rule.endDate), {
   message: "End date must be on or after start date", path: ["endDate"],
 });
 
@@ -89,7 +93,7 @@ export const benefitSchema = benefitFields.extend({
   usedValue: nonnegativeMoney.default(0), active: z.boolean().default(true),
 }).refine((benefit) => benefit.usedValue <= benefit.totalValue, {
   message: "Used value cannot exceed total value", path: ["usedValue"],
-}).refine((benefit) => !benefit.expirationDate || benefit.startDate.slice(0, 10) <= benefit.expirationDate.slice(0, 10), {
+}).refine((benefit) => orderedDays(benefit.startDate, benefit.expirationDate), {
   message: "Expiration must be on or after start date", path: ["expirationDate"],
 });
 export const benefitUpdateSchema = benefitFields.partial().extend({

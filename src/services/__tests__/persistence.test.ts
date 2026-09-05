@@ -153,6 +153,17 @@ describe("authenticated API and ownership", () => {
     expect(updated.status).toBe(200);
     expect(await updated.json()).toMatchObject({ merchant: "Renamed", status: "pending", isRefund: true });
   });
+
+  it("uses an exclusive UTC upper bound for transaction date filters", async () => {
+    await createSession(userId);
+    await db.transaction.createMany({ data: [
+      { ...input({ transactionDate: new Date("2026-09-05T23:59:59Z") }), userId },
+      { ...input({ transactionDate: new Date("2026-09-06T00:00:00Z") }), userId },
+    ] });
+    const response = await transactionRoutes.GET(new Request("http://localhost/api/transactions?to=2026-09-05"));
+    expect(response.status).toBe(200);
+    expect((await response.json()).transactions).toHaveLength(1);
+  });
 });
 
 describe("benefit updates and aggregates", () => {

@@ -4,6 +4,8 @@ import { handleApi, requireUser } from "@/lib/api";
 import { transactionSchema } from "@/lib/validation";
 import { createTransactionWithEffects } from "@/services/transactions";
 import type { Prisma } from "@prisma/client";
+import { dayAfter, dayStart } from "@/lib/dates";
+import { dateString } from "@/lib/validation";
 
 const PAGE_SIZE = 25;
 
@@ -21,8 +23,8 @@ export const GET = handleApi(async (req: Request) => {
   const to = q.get("to");
   if (from || to) {
     where.transactionDate = {
-      ...(from ? { gte: new Date(from) } : {}),
-      ...(to ? { lte: new Date(to + "T23:59:59.999") } : {}),
+      ...(from ? { gte: dayStart(dateString.parse(from)) } : {}),
+      ...(to ? { lt: dayAfter(dateString.parse(to)) } : {}),
     };
   }
 
