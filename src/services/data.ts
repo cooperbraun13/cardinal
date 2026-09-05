@@ -88,8 +88,9 @@ export async function getBonusesWithProgress(userId: string) {
 /** Everything the dashboard needs in one aggregated payload. */
 export async function getDashboardData(userId: string) {
   const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  const nextMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+  const prevMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
 
   const [cards, monthRewards, monthSpendByCategory, prevMonthSpend, recentTransactions, benefits, bonuses] =
     await Promise.all([
@@ -100,12 +101,12 @@ export async function getDashboardData(userId: string) {
       }),
       prisma.reward.groupBy({
         by: ["rewardType"],
-        where: { card: { userId }, transaction: { transactionDate: { gte: monthStart }, status: "posted" } },
+        where: { card: { userId }, transaction: { transactionDate: { gte: monthStart, lt: nextMonthStart }, status: "posted" } },
         _sum: { rewardAmount: true },
       }),
       prisma.transaction.groupBy({
         by: ["category"],
-        where: { userId, status: "posted", isRefund: false, transactionDate: { gte: monthStart } },
+        where: { userId, status: "posted", isRefund: false, transactionDate: { gte: monthStart, lt: nextMonthStart } },
         _sum: { amount: true },
       }),
       prisma.transaction.aggregate({
