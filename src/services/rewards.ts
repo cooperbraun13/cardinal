@@ -39,6 +39,18 @@ export interface RuleSelection {
   capped: boolean; // true when a better rule existed but its spending cap was exhausted
 }
 
+export type RuleSpend = number | ((rule: RewardRule) => number);
+
+/** Spend belonging to this rule's category and inclusive UTC date window. */
+export function countsTowardCap(
+  rule: RewardRule,
+  transaction: { category: string; transactionDate: Date; status: string; isRefund: boolean }
+): boolean {
+  return transaction.status === "posted" && !transaction.isRefund &&
+    (rule.category === EVERYTHING || rule.category === transaction.category) &&
+    isRuleActive(rule, transaction.transactionDate);
+}
+
 /**
  * Selects the best applicable reward rule for a purchase.
  *
@@ -52,7 +64,7 @@ export function selectRewardRule(
   rules: RewardRule[],
   category: string,
   date: Date,
-  categorySpendSoFar = 0
+  categorySpendSoFar: RuleSpend = 0
 ): RuleSelection {
   const applicable = rules
     .filter((r) => (r.category === category || r.category === EVERYTHING) && isRuleActive(r, date))
@@ -60,13 +72,39 @@ export function selectRewardRule(
 
   let capped = false;
   for (const rule of applicable) {
-    if (rule.spendingCap != null && categorySpendSoFar >= rule.spendingCap) {
+    const spend = typeof categorySpendSoFar === "number" ? categorySpendSoFar : categorySpendSoFar(rule);
+    if (rule.spendingCap != null && spend >= rule.spendingCap) {
       capped = true;
       continue;
     }
     return { rule, multiplier: rule.multiplier, capped };
   }
   return { rule: null, multiplier: 1, capped };
+}
+
+/** Split a purchase at cap boundaries; the remainder earns the next available rate. */
+export function evaluatePurchase(
+  rules: RewardRule[], category: string, amount: number, date: Date, spend: RuleSpend = 0
+) {
+  const totalCents = Math.round(amount * 100);
+  let consumed = 0;
+  let earned = 0;
+  let capped = false;
+  let promo = false;
+  while (consumed < totalCents) {
+    const usage = (rule: RewardRule) =>
+      (typeof spend === "number" ? spend : spend(rule)) + consumed / 100;
+    const selection = selectRewardRule(rules, category, date, usage);
+    const rule = selection.rule;
+    const portion = rule?.spendingCap == null ? totalCents - consumed :
+      Math.min(totalCents - consumed, Math.max(1, Math.round((rule.spendingCap - usage(rule)) * 100)));
+    earned += portion * selection.multiplier;
+    consumed += portion;
+    capped ||= selection.capped || consumed < totalCents;
+    promo ||= !!rule && (rule.startDate != null || rule.endDate != null);
+  }
+  const rewardAmount = Math.round(earned) / 100;
+  return { rewardAmount, multiplier: amount > 0 ? rewardAmount / amount : 1, capped, promo };
 }
 
 /** Reward earned for a purchase, rounded to 2 decimals. Refunds earn negative rewards. */

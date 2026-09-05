@@ -1,7 +1,7 @@
 // Best-card recommendation. Pure ranking logic — data assembly happens in the
 // API layer so this stays unit-testable.
 
-import { selectRewardRule, calculateReward, type RewardRule } from "@/services/rewards";
+import { evaluatePurchase, type RewardRule, type RuleSpend } from "@/services/rewards";
 import { categoryLabel } from "@/lib/categories";
 
 export interface CandidateCard {
@@ -11,7 +11,7 @@ export interface CandidateCard {
   rewardType: string; // points | miles | cashback
   rules: RewardRule[];
   /** Posted non-refund spend already accumulated in this category (for cap checks). */
-  categorySpendSoFar: number;
+  categorySpendSoFar: RuleSpend;
 }
 
 export interface Recommendation {
@@ -33,17 +33,17 @@ export interface Recommendation {
 const VALUE_PER_UNIT: Record<string, number> = { points: 0.01, miles: 0.012 };
 
 export function scoreCard(card: CandidateCard, category: string, amount: number, date: Date) {
-  const selection = selectRewardRule(card.rules, category, date, card.categorySpendSoFar);
+  const selection = evaluatePurchase(card.rules, category, amount, date, card.categorySpendSoFar);
   const rate = selection.multiplier;
   const isCashback = card.rewardType === "cashback";
   // Cashback multiplier means percent back; points/miles mean units per dollar.
   const estimatedRewards = isCashback
-    ? Math.round(amount * rate) / 100
-    : calculateReward(amount, rate);
+    ? Math.round(selection.rewardAmount) / 100
+    : selection.rewardAmount;
   const estimatedValue = isCashback
     ? estimatedRewards
     : Math.round(estimatedRewards * (VALUE_PER_UNIT[card.rewardType] ?? 0.01) * 100) / 100;
-  const promo = !!selection.rule && (selection.rule.startDate != null || selection.rule.endDate != null);
+  const promo = selection.promo;
   return { selection, rate, estimatedRewards, estimatedValue, promo };
 }
 
@@ -86,9 +86,10 @@ function buildExplanation(
   promo: boolean
 ): string {
   const label = categoryLabel(category).toLowerCase();
-  const unit = card.rewardType === "cashback" ? `${rate}% back` : `${rate}x ${card.rewardType}`;
+  const displayRate = Number(rate.toFixed(2));
+  const unit = card.rewardType === "cashback" ? `${displayRate}% back` : `${displayRate}x ${card.rewardType}`;
   if (capped)
-    return `Earns ${unit} on ${label} — a higher-rate rule exists but its spending cap is exhausted.`;
+    return `Earns an effective ${unit} on ${label} after applying spending caps.`;
   if (promo) return `Earns ${unit} on ${label} thanks to a limited-time promotion.`;
   if (rate <= 1) return `No ${label} bonus on this card — earns the base rate of ${unit}.`;
   return `Earns ${unit} on ${label} purchases.`;

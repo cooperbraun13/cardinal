@@ -2,7 +2,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { getCurrentUser } from "@/lib/auth";
-import type { User } from "@prisma/client";
+import { Prisma, type User } from "@prisma/client";
 
 /** Consistent JSON error shape: { error: CODE, message } */
 export class ApiError extends Error {
@@ -46,6 +46,9 @@ export function handleApi<Args extends unknown[]>(
           "VALIDATION_ERROR",
           `${path ? path + ": " : ""}${first?.message ?? "Invalid input."}`
         );
+      }
+      if (err instanceof Prisma.PrismaClientKnownRequestError && ["P2034", "P2028", "P1008"].includes(err.code)) {
+        return jsonError(409, "WRITE_CONFLICT", "Another update conflicted with this one. Please try again.");
       }
       console.error("Unhandled API error:", err);
       return jsonError(500, "INTERNAL_ERROR", "Something went wrong. Please try again.");

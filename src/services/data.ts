@@ -1,11 +1,11 @@
 import "server-only";
 import { prisma } from "@/lib/db";
-import { utilization, overallUtilization, selectRewardRule, calculateReward } from "@/services/rewards";
+import { utilization, overallUtilization, countsTowardCap } from "@/services/rewards";
 import { eligibleSpend, bonusProgress } from "@/services/bonuses";
 import { benefitStatus, benefitRemaining, effectiveExpiry } from "@/services/benefits";
 import { rankCards, type CandidateCard, type Recommendation } from "@/services/recommend";
 import { nextOccurrence } from "@/lib/format";
-import type { Card, SignupBonus, Transaction } from "@prisma/client";
+import type { Card, SignupBonus } from "@prisma/client";
 
 /** Card reward type derived from its signup bonus (schema keeps reward type per reward/bonus). */
 function cardRewardType(card: Card & { signupBonuses: SignupBonus[] }): string {
@@ -13,27 +13,30 @@ function cardRewardType(card: Card & { signupBonuses: SignupBonus[] }): string {
 }
 
 /**
- * Assembles optimizer candidates in two queries total (cards+rules, category spend)
- * — no per-card queries (see practice ticket 7).
+ * Loads candidates and cap history in batches, never one query per card/rule.
  */
-export async function getCandidateCards(userId: string, category: string): Promise<CandidateCard[]> {
+export async function getCandidateCards(userId: string): Promise<CandidateCard[]> {
   const cards = await prisma.card.findMany({
     where: { userId, active: true },
     include: { rewardCategories: true, signupBonuses: true },
   });
   if (cards.length === 0) return [];
 
-  const spend = await prisma.transaction.groupBy({
-    by: ["cardId"],
+  const spend = await prisma.transaction.findMany({
     where: {
-      cardId: { in: cards.map((c) => c.id) },
-      category,
+      cardId: { in: cards.filter((card) => card.rewardCategories.some((rule) => rule.spendingCap != null)).map((c) => c.id) },
+      transactionDate: { lte: new Date() },
       status: "posted",
       isRefund: false,
     },
-    _sum: { amount: true },
+    select: { cardId: true, amount: true, category: true, transactionDate: true, status: true, isRefund: true },
   });
-  const spendByCard = new Map(spend.map((s) => [s.cardId, s._sum.amount ?? 0]));
+  const spendByCard = new Map<string, typeof spend>();
+  for (const transaction of spend) {
+    const history = spendByCard.get(transaction.cardId) ?? [];
+    history.push(transaction);
+    spendByCard.set(transaction.cardId, history);
+  }
 
   return cards.map((card) => ({
     id: card.id,
@@ -41,7 +44,8 @@ export async function getCandidateCards(userId: string, category: string): Promi
     issuer: card.issuer,
     rewardType: cardRewardType(card),
     rules: card.rewardCategories,
-    categorySpendSoFar: spendByCard.get(card.id) ?? 0,
+    categorySpendSoFar: (rule) => Math.round((spendByCard.get(card.id) ?? [])
+      .reduce((sum, transaction) => sum + (countsTowardCap(rule, transaction) ? transaction.amount : 0), 0) * 100) / 100,
   }));
 }
 
@@ -50,75 +54,11 @@ export async function recommendCard(
   category: string,
   amount: number
 ): Promise<{ recommendation: Recommendation | null; alternatives: Recommendation[] }> {
-  const candidates = await getCandidateCards(userId, category);
+  const candidates = await getCandidateCards(userId);
   const ranked = rankCards(candidates, category, amount);
   return { recommendation: ranked[0] ?? null, alternatives: ranked.slice(1, 4) };
 }
 
-/**
- * Creates a transaction, computes its reward from the card's rules, and adjusts
- * the card balance — atomically. Refunds decrease the balance and earn negative rewards.
- */
-export async function createTransactionWithEffects(
-  userId: string,
-  data: {
-    cardId: string;
-    merchant: string;
-    amount: number;
-    category: string;
-    transactionDate: Date;
-    status: string;
-    isRefund: boolean;
-  },
-  card: Card & { rewardCategories: { category: string; multiplier: number; startDate: Date | null; endDate: Date | null; spendingCap: number | null }[]; signupBonuses: SignupBonus[] }
-): Promise<Transaction> {
-  const categorySpend = await prisma.transaction.aggregate({
-    where: { cardId: card.id, category: data.category, status: "posted", isRefund: false },
-    _sum: { amount: true },
-  });
-  const selection = selectRewardRule(
-    card.rewardCategories,
-    data.category,
-    data.transactionDate,
-    categorySpend._sum.amount ?? 0
-  );
-  const rewardAmount = calculateReward(data.amount, selection.multiplier, data.isRefund);
-  const balanceDelta = data.isRefund ? -data.amount : data.amount;
-
-  const [transaction] = await prisma.$transaction([
-    prisma.transaction.create({
-      data: {
-        ...data,
-        userId,
-        rewards: {
-          create: {
-            cardId: card.id,
-            multiplier: selection.multiplier,
-            rewardAmount,
-            rewardType: cardRewardType(card),
-          },
-        },
-      },
-    }),
-    prisma.card.update({
-      where: { id: card.id },
-      data: { currentBalance: Math.max(0, card.currentBalance + balanceDelta) },
-    }),
-  ]);
-  return transaction;
-}
-
-/** Reverses a transaction's balance effect and deletes it (rewards cascade). */
-export async function deleteTransactionWithEffects(transaction: Transaction, card: Card) {
-  const balanceDelta = transaction.isRefund ? transaction.amount : -transaction.amount;
-  await prisma.$transaction([
-    prisma.transaction.delete({ where: { id: transaction.id } }),
-    prisma.card.update({
-      where: { id: card.id },
-      data: { currentBalance: Math.max(0, card.currentBalance + balanceDelta) },
-    }),
-  ]);
-}
 
 /** Signup bonuses with computed progress for a set of cards (single transaction query). */
 export async function getBonusesWithProgress(userId: string) {
