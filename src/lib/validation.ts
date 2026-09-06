@@ -9,6 +9,16 @@ import {
   CARD_THEMES,
 } from "@/lib/categories";
 import { dayStart } from "@/lib/dates";
+import {
+  ANNUAL_INCOME_RANGES,
+  DEBT_STATUSES,
+  EMERGENCY_FUND_STATUSES,
+  EMPLOYER_RETIREMENT_STATUSES,
+  EMPLOYMENT_STATUSES,
+  INVESTING_EXPERIENCE_LEVELS,
+  RISK_COMFORT_LEVELS,
+  SAVINGS_RANGES,
+} from "@/features/profile/options";
 
 // Shared between frontend forms and backend routes. Backend validation is the
 // source of truth; frontend reuses these for immediate feedback.
@@ -131,3 +141,16 @@ export const recommendSchema = z.object({
   amount: positiveMoney,
   merchant: z.string().trim().max(120).optional(),
 });
+
+export const profileUpdateSchema = z.object({
+  employmentStatus: z.enum(EMPLOYMENT_STATUSES).nullable(),
+  annualIncomeRange: z.enum(ANNUAL_INCOME_RANGES).nullable(),
+  savingsRange: z.enum(SAVINGS_RANGES).nullable(),
+  emergencyFundStatus: z.enum(EMERGENCY_FUND_STATUSES).nullable(),
+  creditCardDebtStatus: z.enum(DEBT_STATUSES).nullable(),
+  otherDebtStatus: z.enum(DEBT_STATUSES).nullable(),
+  employer401kStatus: z.enum(EMPLOYER_RETIREMENT_STATUSES).nullable(),
+  employerMatchStatus: z.enum(EMPLOYER_RETIREMENT_STATUSES).nullable(),
+  investingExperience: z.enum(INVESTING_EXPERIENCE_LEVELS).nullable(),
+  riskComfort: z.enum(RISK_COMFORT_LEVELS).nullable(),
+}).strict();

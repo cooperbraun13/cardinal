@@ -31,17 +31,17 @@ export default async function AppLayout({
         <div className="app-footer-inner">
           <div className="flex items-center gap-design-sm">
             <Brand />
-            <span>Credit. Considered.</span>
+            <span>Money, made clear.</span>
           </div>
           <nav aria-label="Footer" className="flex flex-wrap gap-design-sm">
-            <Link className="text-link" href="/cards">
-              Your wallet
+            <Link className="text-link" href="/money">
+              Money
             </Link>
-            <Link className="text-link" href="/benefits">
-              Benefits
+            <Link className="text-link" href="/learn">
+              Learn
             </Link>
-            <Link className="text-link" href="/optimizer">
-              Optimizer
+            <Link className="text-link" href="/plan">
+              Plan
             </Link>
           </nav>
         </div>

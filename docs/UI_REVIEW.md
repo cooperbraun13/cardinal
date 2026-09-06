@@ -1,10 +1,10 @@
 # Cardinal UI redesign review
 
-## Design implemented
+## Status
 
-The saved `docs/DESIGN.md` (Ferrari-design-analysis) is the visual source of truth. Cardinal now uses its near-black `#181818` canvas, white display type, restrained Rosso Corsa `#da291c` primary actions, cinematic photography, sharp component edges, and generous editorial spacing. Inter is the documented substitute for the unavailable licensed FerrariSans font; headings use weight 500 and body copy uses 400.
+This document records the v1 interface review. The current visual source of truth is [DESIGN.md](DESIGN.md), which describes Cardinal’s implemented tokens, components, accessibility expectations, and v2 navigation patterns. The earlier external automotive reference has been removed from product guidance.
 
-The 4/8/16/24/32/48/64/96/128px spacing ladder is centralized in `globals.css`. Tailwind utilities use a `design-` prefix to avoid collisions with container widths such as `max-w-xl`. Small running text uses the readable body-gray token; validation text uses a lighter red for contrast. Card theme selections retain muted material finishes.
+The 4/8/16/24/32/48/64/96/128px spacing ladder is centralized in `globals.css`. Tailwind utilities use a `design-` prefix to avoid collisions with container widths such as `max-w-xl`. Small running text uses the readable muted token; validation text uses a lighter red for contrast. Card theme selections retain muted material finishes.
 
 ## Page and component coverage
 
@@ -34,10 +34,10 @@ Browser checks used isolated headless Microsoft Edge (Chromium), with mobile vie
 
 ## Hero asset
 
-Saved asset: `public/cardinal-cinema.webp` (about 90 KB). Mode: new generation with the built-in image tool; optimized to WebP for delivery.
+Displayed asset: `public/cardinal-cinema-hd.png`.
 
-Prompt: A photoreal, cinematic wide landscape studio photograph for Cardinal, adapting luxury automotive editorial art direction to personal finance. One unbranded matte graphite titanium credit card, engraved metallic EMV chip, dramatic diagonal on a dark architectural slab, tactile brushed-metal grooves and restrained racing-red edge reflections. Near-black background, low-key lighting, dark negative space on the left for white headlines. No text, numbers, logos, watermarks, UI, charts, coins, people, or competing blue/purple accents.
+The hero is an optional visual treatment for the existing credit overview. It should not be copied onto every future finance surface; the v2 foundation favors simple reading and action-oriented layouts where they better support comprehension.
 
 ## Scope
 
-Changes are confined to presentation, shared UI and client interaction states. API routes, service calculations, authentication implementation, Prisma schema and database behavior are unchanged. Mutation checks used a separate database snapshot. The user's saved design document and designer-agent instructions were preserved.
+The reviewed changes were confined to presentation, shared UI and client interaction states. API routes, service calculations, authentication implementation, Prisma schema and database behavior were unchanged. Mutation checks used a separate database snapshot.

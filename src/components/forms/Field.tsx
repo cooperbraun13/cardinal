@@ -9,11 +9,13 @@ export function Field({
   children,
   className,
   htmlFor,
+  hint,
 }: {
   label: string;
   children: React.ReactNode;
   className?: string;
   htmlFor?: string;
+  hint?: React.ReactNode;
 }) {
   const generatedId = useId();
   const childId = isValidElement<{ id?: string }>(children)
@@ -33,6 +35,9 @@ export function Field({
         {label}
       </Label>
       {control}
+      {hint && (
+        <p className="text-xs leading-5 text-muted-foreground">{hint}</p>
+      )}
     </div>
   );
 }

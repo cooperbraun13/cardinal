@@ -15,6 +15,8 @@ The implemented application supports:
 - Benefits with used/remaining value, reset frequency, status, and expiration handling.
 - Signup-bonus progress computed from eligible posted spend in the card-opened-to-deadline window.
 - An optimizer that ranks active cards by reward value for a category and amount, with alternatives and explanations. The optional merchant input is accepted but does not currently affect ranking.
+- An optional financial profile that stores only ranges and simple context for future planning. It can be revised or cleared at any time and does not collect account credentials or exact balances.
+- A first version of Cardinal Plan that uses transparent, educational rules to organize next steps from a person's optional profile answers.
 
 `StatementPeriod` is stored in the database schema but has no user-facing page or API flow yet. See [Data model](DATA_MODEL.md#statementperiod).
 
@@ -32,7 +34,7 @@ The current version is a manual-entry credit-card product. Its core journey is: 
 
 ## Future direction
 
-Broader personal-finance expansion is a direction, not an implemented feature set. Keep future ideas separate from current behavior until product requirements, data design, and security constraints are defined.
+Cardinal now has a v2 foundation: Home, Money, Invest, Learn, Plan, and Profile provide a stable product structure; Money exposes the existing credit-card experience, and Learn has its first data-driven lessons. Broader financial workflows, profile collection, Plan recommendations, calculators, and account connections are not implemented yet. The architecture, safeguards, and phased roadmap are in [Cardinal v2 foundation](CARDINAL_V2.md).
 
 ## Scope guardrails
 
