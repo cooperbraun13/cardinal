@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { PrismaClient } from "@prisma/client";
-import { mkdtemp, mkdir, readFile, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, readdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 
 const state = vi.hoisted(() => ({ db: null as PrismaClient | null, token: "" }));
@@ -21,6 +21,7 @@ import * as transactionRoutes from "@/app/api/transactions/route";
 import * as transactionRoute from "@/app/api/transactions/[id]/route";
 import * as cardRoute from "@/app/api/cards/[id]/route";
 import * as benefitRoute from "@/app/api/benefits/[id]/route";
+import * as profileRoute from "@/app/api/profile/route";
 
 let db: PrismaClient;
 let directory: string;
@@ -32,6 +33,19 @@ const request = (body: unknown, method = "PATCH") => new Request("http://localho
 });
 const input = (extra = {}) => ({ cardId, merchant: "Fixture", amount: 100, category: "dining",
   transactionDate: new Date("2026-08-15"), status: "posted", isRefund: false, ...extra });
+const profileInput = (extra = {}) => ({
+  employmentStatus: "employed",
+  annualIncomeRange: "50000_to_74999",
+  savingsRange: "5000_to_9999",
+  emergencyFundStatus: "starter_fund",
+  creditCardDebtStatus: "some",
+  otherDebtStatus: "none",
+  employer401kStatus: "available",
+  employerMatchStatus: "not_sure",
+  investingExperience: "new",
+  riskComfort: "not_sure",
+  ...extra,
+});
 
 beforeAll(async () => {
   const root = path.join(process.cwd(), ".test-tmp");
@@ -39,9 +53,19 @@ beforeAll(async () => {
   directory = await mkdtemp(path.join(root, "persistence-"));
   db = new PrismaClient({ datasources: { db: { url: `file:${path.join(directory, "test.db")}` } } });
   state.db = db;
-  const sql = await readFile(path.join(process.cwd(), "prisma/migrations/20260820181308_init/migration.sql"), "utf8");
-  for (const statement of sql.split(";").filter((part) => part.trim())) {
-    await db.$executeRawUnsafe(statement);
+  const migrationsDirectory = path.join(process.cwd(), "prisma/migrations");
+  const migrations = (await readdir(migrationsDirectory, { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+  for (const migration of migrations) {
+    const sql = await readFile(
+      path.join(migrationsDirectory, migration, "migration.sql"),
+      "utf8",
+    );
+    for (const statement of sql.split(";").filter((part) => part.trim())) {
+      await db.$executeRawUnsafe(statement);
+    }
   }
 });
 
@@ -178,6 +202,62 @@ describe("authenticated API and ownership", () => {
     const response = await transactionRoutes.GET(new Request("http://localhost/api/transactions?to=2026-09-05"));
     expect(response.status).toBe(200);
     expect((await response.json()).transactions).toHaveLength(1);
+  });
+});
+
+describe("financial profile persistence", () => {
+  it("requires a session and only returns the current user's profile", async () => {
+    expect(
+      (await profileRoute.GET()).status,
+    ).toBe(401);
+
+    await createSession(userId);
+    const saved = await profileRoute.PUT(request(profileInput(), "PUT"));
+    expect(saved.status).toBe(200);
+    expect(await saved.json()).toMatchObject({
+      employmentStatus: "employed",
+      annualIncomeRange: "50000_to_74999",
+      creditCardDebtStatus: "some",
+    });
+
+    const other = await db.user.create({
+      data: {
+        name: "Other",
+        email: "other-profile@example.test",
+        passwordHash: "fixture",
+        financialProfile: { create: { employmentStatus: "student" } },
+      },
+    });
+    const response = await profileRoute.GET();
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      employmentStatus: "employed",
+    });
+    expect(
+      await db.financialProfile.findUnique({ where: { userId: other.id } }),
+    ).toMatchObject({ employmentStatus: "student" });
+  });
+
+  it("validates profile ranges and clears an all-empty submission", async () => {
+    await createSession(userId);
+    expect(
+      (
+        await profileRoute.PUT(
+          request(profileInput({ annualIncomeRange: "an_exact_amount" }), "PUT"),
+        )
+      ).status,
+    ).toBe(400);
+
+    await profileRoute.PUT(request(profileInput(), "PUT"));
+    const emptyProfile = Object.fromEntries(
+      Object.keys(profileInput()).map((key) => [key, null]),
+    );
+    const cleared = await profileRoute.PUT(request(emptyProfile, "PUT"));
+    expect(cleared.status).toBe(200);
+    expect(await cleared.json()).toBeNull();
+    expect(
+      await db.financialProfile.findUnique({ where: { userId } }),
+    ).toBeNull();
   });
 });
 

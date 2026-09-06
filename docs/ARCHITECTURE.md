@@ -1,6 +1,6 @@
 # Architecture
 
-Cardinal is a single Next.js application. See [Product](PRODUCT.md), [Data model](DATA_MODEL.md), and [Testing](TESTING.md) for the corresponding product, persistence, and verification guidance.
+Cardinal is a single Next.js application. See [Product](PRODUCT.md), [Data model](DATA_MODEL.md), [Testing](TESTING.md), and the [Cardinal v2 foundation](CARDINAL_V2.md) for the corresponding product, persistence, verification, and expansion guidance.
 
 ## High-level flow
 
@@ -27,6 +27,7 @@ There are no external product integrations in the repository.
 ```text
 src/app/          routes, layouts, server pages, and API route handlers
 src/components/   shared product UI, forms, and UI primitives
+src/features/     feature-owned code; Learn is the first v2 feature module
 src/services/     pure financial rules plus dashboard/transaction orchestration
 src/lib/          auth, Prisma singleton, validation, ownership, formatting, client fetch helper
 prisma/           schema, migration history, and deterministic demo seed
@@ -38,7 +39,7 @@ docs/             product and engineering context
 
 Route handlers in `src/app/api` use `handleApi` for consistent JSON errors, call `requireUser`, parse Zod input, and enforce ownership before mutations. Transaction routes delegate balance/reward effects to `src/services/transactions.ts`; reward-rule and signup-bonus writes have focused services as well. Recommendation and dashboard endpoints delegate to `src/services/data.ts`.
 
-Pure rules live in `src/services/rewards.ts`, `bonuses.ts`, `benefits.ts`, and `recommend.ts`. Keep calculations there so they can be tested without React or Prisma. `src/services/data.ts` assembles dashboard and optimizer data efficiently; write services own multi-record transaction boundaries.
+Pure rules live in `src/services/rewards.ts`, `bonuses.ts`, `benefits.ts`, and `recommend.ts`. Keep calculations there so they can be tested without React or Prisma. `src/services/data.ts` assembles dashboard and optimizer data efficiently; write services own multi-record transaction boundaries. The financial-profile API is the first v2 domain API: `src/app/api/profile` authenticates and validates requests, then delegates profile persistence to `src/features/profile/service.ts`. The initial Cardinal Plan rules are pure functions in `src/features/plan/rules.ts`; its page reads the authenticated user's profile server-side.
 
 `src/lib/db.ts` owns the server Prisma singleton. `src/lib/ownership.ts` scopes card, transaction, and benefit lookups to the authenticated user and returns 404 for non-owned resources. Client components must not access Prisma.
 

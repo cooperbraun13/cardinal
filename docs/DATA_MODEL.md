@@ -7,6 +7,7 @@ The Prisma schema is the source of truth: [`prisma/schema.prisma`](../prisma/sch
 ```text
 User
 ├── Session
+├── FinancialProfile
 ├── Card
 │   ├── RewardCategory
 │   ├── Benefit
@@ -20,15 +21,25 @@ User
 
 `Transaction` belongs to both its owner (`User`) and the charged `Card`. `Reward` also records both its source transaction and card.
 
+## FinancialProfile
+
+`FinancialProfile` is an optional one-to-one record owned by `User`. The first version stores only optional ranges and simple context: employment status, income and savings ranges, emergency-fund and debt status, employer retirement-plan/match availability, investing experience, and risk comfort. An all-empty update removes the record instead of representing unanswered fields as zero values.
+
+The profile does not store account credentials, exact balances, employer identity, investment holdings, or inferred information from a user's cards. Each field is nullable because a missing answer is distinct from a negative answer. The `profileVersion` field supports deliberate future changes to the question set. Goals and profile-answer history have not been added yet; see [Cardinal v2 foundation](CARDINAL_V2.md#financial-profile-direction) for the privacy constraints and future direction.
+
 ## Models
 
 ### User
 
-Owns cards, transactions, and sessions. `email` is unique; `passwordHash` is never returned to the client. Deleting a user cascades to its related records through the schema's foreign keys.
+Owns cards, transactions, sessions, and an optional financial profile. `email` is unique; `passwordHash` is never returned to the client. Deleting a user cascades to its related records through the schema's foreign keys.
 
 ### Session
 
 Stores a unique random token, owner, expiry, and creation time. It has an index on `userId` and is the server-side source of authentication.
+
+### FinancialProfile
+
+Stores optional, owner-scoped context for future transparent education and Plan rules. `userId` is unique and cascades on user deletion. The profile API derives the user from the session; it never accepts an owner ID from the client.
 
 ### Card
 
