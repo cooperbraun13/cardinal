@@ -58,10 +58,11 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       <div className="grid min-h-[calc(100svh-64px)] lg:grid-cols-[1.1fr_1fr]">
         <aside className="relative isolate flex min-h-64 items-end overflow-hidden bg-background sm:min-h-80 lg:min-h-full">
           <Image
-            src="/cardinal-cinema.webp"
+            src="/cardinal-cinema-hd.png"
             alt=""
             fill
             priority
+            quality={100}
             sizes="(min-width: 1024px) 55vw, 100vw"
             className="-z-20 object-cover object-[65%_center]"
           />

@@ -13,7 +13,14 @@ export function CinematicHero({
 }) {
   return (
     <header className="cinema-hero">
-      <Image src="/cardinal-cinema.webp" alt="" fill priority sizes="100vw" />
+      <Image
+        src="/cardinal-cinema-hd.png"
+        alt=""
+        fill
+        priority
+        quality={100}
+        sizes="100vw"
+      />
       <div className="cinema-copy">
         <p className="eyebrow mb-design-sm">{eyebrow}</p>
         <h1 className="cinema-title">{title}</h1>
