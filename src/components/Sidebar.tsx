@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { apiFetch } from "@/lib/client";
 import { Brand } from "@/components/Brand";
+import { ErrorBanner } from "@/components/ErrorBanner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -47,11 +48,21 @@ export function Sidebar({ userName }: { userName: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [error, setError] = useState("");
 
   async function logout() {
-    await apiFetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-    router.refresh();
+    setError("");
+    setLoggingOut(true);
+    try {
+      await apiFetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+      router.refresh();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not log out.");
+    } finally {
+      setLoggingOut(false);
+    }
   }
 
   const navigation = (
@@ -97,7 +108,7 @@ export function Sidebar({ userName }: { userName: string }) {
         <ChevronDownIcon className="size-4 shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-52">
-        <DropdownMenuItem onClick={logout}>
+        <DropdownMenuItem onClick={logout} disabled={loggingOut}>
           <LogOutIcon className="size-4" />
           Log out
         </DropdownMenuItem>
@@ -116,7 +127,9 @@ export function Sidebar({ userName }: { userName: string }) {
           <Brand />
         </Link>
         <div className="mt-9">{navigation}</div>
-        <div className="mt-auto border-t border-sidebar-border px-3 pt-4">{account}</div>
+        <div className="mt-auto border-t border-sidebar-border px-3 pt-4">
+          {error && <ErrorBanner message={error} />}{account}
+        </div>
       </aside>
 
       <div className="sticky top-0 z-40 border-b border-sidebar-border bg-sidebar lg:hidden">
@@ -142,7 +155,9 @@ export function Sidebar({ userName }: { userName: string }) {
         {mobileOpen && (
           <div id="mobile-navigation" className="border-t border-sidebar-border py-3">
             {navigation}
-            <div className="mt-3 border-t border-sidebar-border px-3 pt-3">{account}</div>
+            <div className="mt-3 border-t border-sidebar-border px-3 pt-3">
+              {error && <ErrorBanner message={error} />}{account}
+            </div>
           </div>
         )}
       </div>

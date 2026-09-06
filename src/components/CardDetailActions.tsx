@@ -7,6 +7,7 @@ import { apiFetch } from "@/lib/client";
 import { categoryLabel } from "@/lib/categories";
 import { formatShortDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
+import { ErrorBanner } from "@/components/ErrorBanner";
 import { Badge } from "@/components/ui/badge";
 import { CardForm, type CardFormValues } from "@/components/forms/CardForm";
 import { RewardRuleForm } from "@/components/forms/RewardRuleForm";
@@ -27,13 +28,17 @@ export function CardActions({ card }: { card: CardFormValues & { id: string } })
   const [editOpen, setEditOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
 
   async function deleteCard() {
+    setError("");
     setDeleting(true);
     try {
       await apiFetch(`/api/cards/${card.id}`, { method: "DELETE" });
       router.push("/cards");
       router.refresh();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not delete card.");
     } finally {
       setDeleting(false);
     }
@@ -62,6 +67,7 @@ export function CardActions({ card }: { card: CardFormValues & { id: string } })
               benefits, and bonus history.
             </DialogDescription>
           </DialogHeader>
+          {error && <ErrorBanner message={error} />}
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>
               Cancel
@@ -90,12 +96,16 @@ export function RewardRules({ cardId, rules }: { cardId: string; rules: RuleView
   const router = useRouter();
   const [addOpen, setAddOpen] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
   async function remove(id: string) {
+    setError("");
     setRemovingId(id);
     try {
       await apiFetch(`/api/reward-categories/${id}`, { method: "DELETE" });
       router.refresh();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not remove rule.");
     } finally {
       setRemovingId(null);
     }
@@ -103,6 +113,7 @@ export function RewardRules({ cardId, rules }: { cardId: string; rules: RuleView
 
   return (
     <div>
+      {error && <ErrorBanner message={error} className="mb-2" />}
       <div className="flex flex-wrap gap-2">
         {rules.map((r) => (
           <Badge key={r.id} variant="secondary" className="gap-1.5 py-1 pr-1 pl-2.5">

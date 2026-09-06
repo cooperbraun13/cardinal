@@ -1,4 +1,5 @@
 // Signup-bonus progress. Pure functions for testability.
+import { dayAfter, dayStart } from "@/lib/dates";
 
 export interface BonusWindow {
   openedAt: Date | null;
@@ -27,8 +28,8 @@ export function eligibleSpend(
 ): number {
   const total = transactions.reduce((sum, t) => {
     if (t.status !== "posted") return sum;
-    if (window.openedAt && t.transactionDate < window.openedAt) return sum;
-    if (t.transactionDate > window.deadline) return sum;
+    if (window.openedAt && t.transactionDate < dayStart(window.openedAt)) return sum;
+    if (t.transactionDate >= dayAfter(window.deadline)) return sum;
     return sum + (t.isRefund ? -t.amount : t.amount);
   }, 0);
   return Math.max(0, Math.round(total * 100) / 100);

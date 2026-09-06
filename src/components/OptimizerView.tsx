@@ -26,7 +26,7 @@ export function OptimizerView() {
   const [category, setCategory] = useState("dining");
   const [amount, setAmount] = useState("100");
   const [merchant, setMerchant] = useState("");
-  const [result, setResult] = useState<RecommendResponse | null>(null);
+  const [result, setResult] = useState<(RecommendResponse & { category: string; amount: number }) | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -34,12 +34,13 @@ export function OptimizerView() {
     event.preventDefault();
     setError("");
     setLoading(true);
+    setResult(null);
     try {
       const response = await apiFetch<RecommendResponse>("/api/recommend-card", {
         method: "POST",
         body: { category, amount: Number(amount), merchant: merchant || undefined },
       });
-      setResult(response);
+      setResult({ ...response, category, amount: Number(amount) });
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Something went wrong.");
     } finally {
@@ -119,7 +120,7 @@ export function OptimizerView() {
             <div className="border-b border-border px-5 py-4 sm:px-6">
               <p className="text-sm font-semibold">Ranked recommendations</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Estimated for a {formatCurrency(Number(amount))} {categoryLabel(category).toLowerCase()} purchase.
+                Estimated for a {formatCurrency(result?.amount ?? 0)} {categoryLabel(result?.category ?? "").toLowerCase()} purchase.
               </p>
             </div>
             <ol className="divide-y divide-border">

@@ -17,27 +17,28 @@ export function formatDate(date: Date | string): string {
     month: "short",
     day: "numeric",
     year: "numeric",
+    timeZone: "UTC",
   });
 }
 
 export function formatShortDate(date: Date | string): string {
-  return new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 }
 
 /** Next occurrence of a day-of-month (1-28), relative to `from`. */
 export function nextOccurrence(dayOfMonth: number, from: Date = new Date()): Date {
-  const d = new Date(from.getFullYear(), from.getMonth(), dayOfMonth);
-  if (d < from) d.setMonth(d.getMonth() + 1);
+  const d = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), dayOfMonth));
+  if (d < dayStart(from)) d.setUTCMonth(d.getUTCMonth() + 1);
   return d;
 }
 
 export function daysUntil(date: Date | string, from: Date = new Date()): number {
-  const target = new Date(date);
-  const start = new Date(from.getFullYear(), from.getMonth(), from.getDate());
-  const end = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+  const start = dayStart(from);
+  const end = dayStart(date);
   return Math.round((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000));
 }
 
 export function formatRewardType(type: string): string {
   return type === "cashback" ? "cash back" : type;
 }
+import { dayStart } from "@/lib/dates";

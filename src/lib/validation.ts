@@ -8,13 +8,22 @@ import {
   NETWORKS,
   CARD_THEMES,
 } from "@/lib/categories";
+import { dayStart } from "@/lib/dates";
 
 // Shared between frontend forms and backend routes. Backend validation is the
 // source of truth; frontend reuses these for immediate feedback.
 
-const dateString = z
-  .string()
-  .refine((s) => !Number.isNaN(Date.parse(s)), "Invalid date");
+export const dateString = z.union([z.iso.date(), z.iso.datetime({ offset: true })]);
+
+/** USD inputs must be representable in whole, safe integer cents. */
+const money = z.union([z.number(), z.string().trim().min(1)]).pipe(
+  z.coerce.number<string | number>().finite().multipleOf(0.01).refine(
+    (value) => Number.isSafeInteger(Math.round(value * 100)),
+    "Amount is too large"
+  )
+);
+const positiveMoney = money.refine((value) => value > 0, "Amount must be positive");
+const nonnegativeMoney = money.refine((value) => value >= 0, "Amount cannot be negative");
 
 export const registerSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
@@ -27,7 +36,7 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-export const cardSchema = z.object({
+const cardFields = z.object({
   name: z.string().trim().min(1, "Card name is required").max(100),
   issuer: z.string().trim().min(1, "Issuer is required").max(100),
   network: z.enum(NETWORKS).nullish(),
@@ -36,63 +45,89 @@ export const cardSchema = z.object({
     .regex(/^\d{4}$/, "Last four must be exactly 4 digits")
     .nullish()
     .or(z.literal("").transform(() => null)),
-  creditLimit: z.coerce.number().positive("Credit limit must be positive"),
-  currentBalance: z.coerce.number().min(0, "Balance cannot be negative").default(0),
-  annualFee: z.coerce.number().min(0, "Annual fee cannot be negative").default(0),
+  creditLimit: positiveMoney,
+  currentBalance: money,
+  annualFee: nonnegativeMoney,
   statementDay: z.coerce.number().int().min(1, "Must be 1-28").max(28, "Must be 1-28"),
   dueDay: z.coerce.number().int().min(1, "Must be 1-28").max(28, "Must be 1-28"),
   openedAt: dateString.nullish(),
+  cardTheme: z.enum(CARD_THEMES),
+  active: z.boolean(),
+});
+
+export const cardSchema = cardFields.extend({
+  currentBalance: money.default(0),
+  annualFee: nonnegativeMoney.default(0),
   cardTheme: z.enum(CARD_THEMES).default("midnight"),
   active: z.boolean().default(true),
 });
+export const cardUpdateSchema = cardFields.partial();
 
-export const cardUpdateSchema = cardSchema.partial();
+const orderedDays = (start: string | null | undefined, end: string | null | undefined) =>
+  !start || !end || dayStart(start).getTime() <= dayStart(end).getTime();
 
 export const rewardCategorySchema = z.object({
   category: z.enum([...CATEGORIES, EVERYTHING] as [string, ...string[]]),
   multiplier: z.coerce.number().positive("Multiplier must be positive").max(100),
   startDate: dateString.nullish(),
   endDate: dateString.nullish(),
-  spendingCap: z.coerce.number().positive().nullish(),
+  spendingCap: positiveMoney.nullish(),
   notes: z.string().max(300).nullish(),
+}).refine((rule) => orderedDays(rule.startDate, rule.endDate), {
+  message: "End date must be on or after start date", path: ["endDate"],
 });
 
-export const benefitSchema = z.object({
+const benefitFields = z.object({
   name: z.string().trim().min(1, "Benefit name is required").max(120),
   description: z.string().max(500).nullish(),
   benefitType: z.enum(BENEFIT_TYPES),
-  totalValue: z.coerce.number().positive("Value must be positive"),
-  usedValue: z.coerce.number().min(0).default(0),
+  totalValue: positiveMoney,
+  usedValue: nonnegativeMoney,
   resetFrequency: z.enum(RESET_FREQUENCIES),
   startDate: dateString,
   expirationDate: dateString.nullish(),
-  active: z.boolean().default(true),
+  active: z.boolean(),
 });
 
-export const benefitUpdateSchema = benefitSchema.partial();
+export const benefitSchema = benefitFields.extend({
+  usedValue: nonnegativeMoney.default(0), active: z.boolean().default(true),
+}).refine((benefit) => benefit.usedValue <= benefit.totalValue, {
+  message: "Used value cannot exceed total value", path: ["usedValue"],
+}).refine((benefit) => orderedDays(benefit.startDate, benefit.expirationDate), {
+  message: "Expiration must be on or after start date", path: ["expirationDate"],
+});
+export const benefitUpdateSchema = benefitFields.partial().extend({
+  usageDelta: positiveMoney.optional(),
+}).refine((body) => body.usageDelta === undefined || body.usedValue === undefined, {
+  message: "Send a usage delta or an absolute value, not both", path: ["usageDelta"],
+});
 
 export const signupBonusSchema = z.object({
-  spendRequirement: z.coerce.number().positive("Spend requirement must be positive"),
+  spendRequirement: positiveMoney,
   rewardAmount: z.coerce.number().positive("Reward amount must be positive"),
   rewardType: z.enum(REWARD_TYPES),
   deadline: dateString,
-  completed: z.boolean().default(false),
+  completed: z.boolean().optional(),
 });
 
-export const transactionSchema = z.object({
+const transactionFields = z.object({
   cardId: z.string().min(1, "Card is required"),
   merchant: z.string().trim().min(1, "Merchant is required").max(120),
-  amount: z.coerce.number().positive("Amount must be a positive number"),
+  amount: positiveMoney,
   category: z.enum(CATEGORIES),
   transactionDate: dateString,
+  status: z.enum(["pending", "posted"]),
+  isRefund: z.boolean(),
+});
+
+export const transactionSchema = transactionFields.extend({
   status: z.enum(["pending", "posted"]).default("posted"),
   isRefund: z.boolean().default(false),
 });
-
-export const transactionUpdateSchema = transactionSchema.partial().omit({ cardId: true });
+export const transactionUpdateSchema = transactionFields.omit({ cardId: true }).partial();
 
 export const recommendSchema = z.object({
   category: z.enum(CATEGORIES),
-  amount: z.coerce.number().positive("Amount must be positive"),
+  amount: positiveMoney,
   merchant: z.string().trim().max(120).optional(),
 });

@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { AddCardButton } from "@/components/AddButtons";
 import { utilization } from "@/services/rewards";
 import { categoryLabel } from "@/lib/categories";
+import { nextOccurrence } from "@/lib/format";
 import { WalletCardsIcon } from "lucide-react";
 
 export interface CardListItem extends CreditCardTileData {
@@ -33,12 +34,7 @@ export function CardsView({ cards }: { cards: CardListItem[] }) {
     if (issuer !== "all") list = list.filter((c) => c.issuer === issuer);
     if (rewardType !== "all")
       list = list.filter((c) => c.rewardCategories.some((r) => r.category === rewardType));
-    const daysToDue = (day: number) => {
-      const now = new Date();
-      const d = new Date(now.getFullYear(), now.getMonth(), day);
-      if (d < now) d.setMonth(d.getMonth() + 1);
-      return d.getTime();
-    };
+    const now = new Date();
     return [...list].sort((a, b) => {
       switch (sort) {
         case "utilization":
@@ -47,7 +43,7 @@ export function CardsView({ cards }: { cards: CardListItem[] }) {
             utilization(a.currentBalance, a.creditLimit)
           );
         case "dueDate":
-          return daysToDue(a.dueDay) - daysToDue(b.dueDay);
+          return nextOccurrence(a.dueDay, now).getTime() - nextOccurrence(b.dueDay, now).getTime();
         case "annualFee":
           return b.annualFee - a.annualFee;
         case "balance":

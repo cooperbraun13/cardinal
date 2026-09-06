@@ -8,6 +8,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { TransactionFilters } from "@/components/TransactionFilters";
 import { TransactionTable } from "@/components/TransactionTable";
 import { Button } from "@/components/ui/button";
+import { dayAfter, dayStart } from "@/lib/dates";
+import { dateString } from "@/lib/validation";
 
 export const metadata = { title: "Transactions - Cardinal" };
 
@@ -28,15 +30,17 @@ export default async function TransactionsPage({ searchParams }: PageProps<"/tra
   const search = first(query.search);
   const from = first(query.from);
   const to = first(query.to);
+  const validFrom = from ? dateString.safeParse(from) : null;
+  const validTo = to ? dateString.safeParse(to) : null;
 
   if (cardId) where.cardId = cardId;
   if (category) where.category = category;
   if (status) where.status = status;
   if (search) where.merchant = { contains: search };
-  if (from || to) {
+  if (validFrom?.success || validTo?.success) {
     where.transactionDate = {
-      ...(from ? { gte: new Date(from) } : {}),
-      ...(to ? { lte: new Date(`${to}T23:59:59.999`) } : {}),
+      ...(validFrom?.success ? { gte: dayStart(validFrom.data) } : {}),
+      ...(validTo?.success ? { lt: dayAfter(validTo.data) } : {}),
     };
   }
 

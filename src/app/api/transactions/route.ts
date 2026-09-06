@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { handleApi, requireUser } from "@/lib/api";
-import { getOwnedCard } from "@/lib/ownership";
 import { transactionSchema } from "@/lib/validation";
-import { createTransactionWithEffects } from "@/services/data";
+import { createTransactionWithEffects } from "@/services/transactions";
 import type { Prisma } from "@prisma/client";
+import { dayAfter, dayStart } from "@/lib/dates";
+import { dateString } from "@/lib/validation";
 
 const PAGE_SIZE = 25;
 
@@ -22,8 +23,8 @@ export const GET = handleApi(async (req: Request) => {
   const to = q.get("to");
   if (from || to) {
     where.transactionDate = {
-      ...(from ? { gte: new Date(from) } : {}),
-      ...(to ? { lte: new Date(to + "T23:59:59.999") } : {}),
+      ...(from ? { gte: dayStart(dateString.parse(from)) } : {}),
+      ...(to ? { lt: dayAfter(dateString.parse(to)) } : {}),
     };
   }
 
@@ -54,11 +55,9 @@ export const GET = handleApi(async (req: Request) => {
 export const POST = handleApi(async (req: Request) => {
   const user = await requireUser();
   const body = transactionSchema.parse(await req.json());
-  const card = await getOwnedCard(user.id, body.cardId); // 404 if not owned
   const transaction = await createTransactionWithEffects(
     user.id,
-    { ...body, transactionDate: new Date(body.transactionDate) },
-    card
+    { ...body, transactionDate: new Date(body.transactionDate) }
   );
   return NextResponse.json(transaction, { status: 201 });
 });
