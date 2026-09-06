@@ -62,7 +62,7 @@ Represents a card statement's start/end dates, balance, optional minimum payment
 
 Financial records are private to the authenticated `User`. Route handlers obtain the user from the server session and use ownership-scoped lookups for cards, transactions, and benefits. Cross-user resources return 404 so their existence is not disclosed.
 
-The transaction create/delete service uses a Prisma transaction to keep the transaction record, reward, and card balance consistent. Treat changes to transaction status, refund state, amount, or category as changes to downstream balance/reward behavior.
+Transaction create/update/delete services use Prisma transactions to keep the transaction record, reward, and card balance consistent. Reward-rule writes reconcile affected reward snapshots in the same transaction. Treat changes to transaction status, refund state, amount, category, date, or reward rules as changes to downstream balance/reward behavior.
 
 ## Financial and date rules
 
@@ -70,6 +70,6 @@ The transaction create/delete service uses a Prisma transaction to keep the tran
 - **Utilization:** `balance / creditLimit * 100`; zero or invalid limits return 0.
 - **Multipliers:** points/miles use units per dollar. Cashback is stored from `amount * rate` and interpreted as percentage-units for display/value conversion (for example, 2% on $100 stores 200 and displays as $2). Optimizer responses calculate cashback estimates directly in dollars.
 - **Refunds and status:** transaction amounts are positive; `isRefund` determines the negative balance/reward effect. Signup-bonus spend includes only posted transactions and subtracts refunds. Pending transactions do not count toward bonus progress.
-- **Dates:** database fields are `DateTime`. Benefit period math and date helpers use local calendar dates, while timestamps are stored in UTC. Be deliberate about date-only input and time-zone boundaries.
+- **Dates:** database fields are `DateTime`. Financial calendar days and inclusive validity windows are normalized to UTC; session expiry remains an exact timestamp.
 
 For calculation behavior and coverage, see [Testing](TESTING.md).

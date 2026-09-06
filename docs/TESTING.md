@@ -12,8 +12,9 @@ Vitest is configured for `src/**/*.test.ts`. The current suite covers pure servi
 - Recommendation ranking and value comparison across points, miles, and cashback.
 - Signup-bonus eligibility: posted-only spending, window boundaries, refunds, and progress.
 - Benefit remaining value, reset periods, expiry, and status.
+- Shared validation, UTC calendar boundaries, and cap-boundary splitting.
 
-There are no API/database integration tests in the repository today. Authorization, route behavior, database writes, dashboard aggregation, and session behavior are important gaps to cover when those flows change.
+The persistence suite creates an isolated SQLite database under `.test-tmp`, applies the committed migration, and removes only that fixture directory afterward. It covers session behavior, ownership boundaries, route behavior, atomic transaction effects and rollback, reward reconciliation, benefit updates, signup-bonus upserts, and dashboard aggregation. The development database is never used by tests.
 
 ## Test priorities
 

@@ -36,9 +36,9 @@ docs/             product and engineering context
 
 ## Request flow and responsibilities
 
-Route handlers in `src/app/api` use `handleApi` for consistent JSON errors, call `requireUser`, parse Zod input, and enforce ownership before mutations. The transaction routes delegate balance/reward effects to `src/services/data.ts`; recommendation and dashboard endpoints delegate to that service as well.
+Route handlers in `src/app/api` use `handleApi` for consistent JSON errors, call `requireUser`, parse Zod input, and enforce ownership before mutations. Transaction routes delegate balance/reward effects to `src/services/transactions.ts`; reward-rule and signup-bonus writes have focused services as well. Recommendation and dashboard endpoints delegate to `src/services/data.ts`.
 
-Pure rules live in `src/services/rewards.ts`, `bonuses.ts`, `benefits.ts`, and `recommend.ts`. Keep calculations there so they can be tested without React or Prisma. `src/services/data.ts` assembles data efficiently and performs multi-record transaction writes.
+Pure rules live in `src/services/rewards.ts`, `bonuses.ts`, `benefits.ts`, and `recommend.ts`. Keep calculations there so they can be tested without React or Prisma. `src/services/data.ts` assembles dashboard and optimizer data efficiently; write services own multi-record transaction boundaries.
 
 `src/lib/db.ts` owns the server Prisma singleton. `src/lib/ownership.ts` scopes card, transaction, and benefit lookups to the authenticated user and returns 404 for non-owned resources. Client components must not access Prisma.
 
