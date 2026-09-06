@@ -5,6 +5,6 @@ import { AuthForm } from "@/components/AuthForm";
 export const metadata = { title: "Log in - Cardinal" };
 
 export default async function LoginPage() {
-  if (await getCurrentUser()) redirect("/dashboard");
+  if (await getCurrentUser()) redirect("/home");
   return <AuthForm mode="login" />;
 }

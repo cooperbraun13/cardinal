@@ -5,6 +5,6 @@ import { AuthForm } from "@/components/AuthForm";
 export const metadata = { title: "Create account - Cardinal" };
 
 export default async function RegisterPage() {
-  if (await getCurrentUser()) redirect("/dashboard");
+  if (await getCurrentUser()) redirect("/home");
   return <AuthForm mode="register" />;
 }

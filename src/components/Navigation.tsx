@@ -23,11 +23,23 @@ import {
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { href: "/dashboard", label: "Overview" },
-  { href: "/cards", label: "Cards" },
-  { href: "/transactions", label: "Transactions" },
-  { href: "/benefits", label: "Benefits" },
-  { href: "/optimizer", label: "Optimizer" },
+  { href: "/home", label: "Home", activePaths: ["/home"] },
+  {
+    href: "/money",
+    label: "Money",
+    activePaths: [
+      "/money",
+      "/dashboard",
+      "/cards",
+      "/transactions",
+      "/benefits",
+      "/optimizer",
+    ],
+  },
+  { href: "/invest", label: "Invest", activePaths: ["/invest"] },
+  { href: "/learn", label: "Learn", activePaths: ["/learn"] },
+  { href: "/plan", label: "Plan", activePaths: ["/plan"] },
+  { href: "/profile", label: "Profile", activePaths: ["/profile"] },
 ];
 
 export function Navigation({ userName }: { userName: string }) {
@@ -51,8 +63,10 @@ export function Navigation({ userName }: { userName: string }) {
   }
 
   function links(mobile = false) {
-    return LINKS.map(({ href, label }) => {
-      const active = pathname === href || pathname.startsWith(`${href}/`);
+    return LINKS.map(({ href, label, activePaths }) => {
+      const active = activePaths.some(
+        (path) => pathname === path || pathname.startsWith(`${path}/`),
+      );
       return (
         <Link
           key={href}
@@ -80,8 +94,8 @@ export function Navigation({ userName }: { userName: string }) {
       <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-design-xs px-design-xs sm:px-design-md lg:px-design-lg">
           <Link
-            href="/dashboard"
-            aria-label="Cardinal overview"
+            href="/home"
+            aria-label="Cardinal home"
             className="shrink-0"
           >
             <Brand />

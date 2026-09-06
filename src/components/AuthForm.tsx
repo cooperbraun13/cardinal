@@ -38,7 +38,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         method: "POST",
         body: parsed.data,
       });
-      router.push("/dashboard");
+      router.push("/home");
       router.refresh();
     } catch (caught) {
       setError(
