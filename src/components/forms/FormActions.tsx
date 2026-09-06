@@ -1,3 +1,4 @@
+import { LoaderCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 
@@ -16,10 +17,21 @@ export function FormActions({
 }) {
   return (
     <DialogFooter>
-      <Button type="button" variant="outline" onClick={onCancel}>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={onCancel}
+        disabled={pending}
+      >
         Cancel
       </Button>
       <Button type="submit" disabled={pending || disabled}>
+        {pending && (
+          <LoaderCircleIcon
+            className="size-4 animate-spin"
+            aria-hidden="true"
+          />
+        )}
         {pending ? pendingLabel : submitLabel}
       </Button>
     </DialogFooter>

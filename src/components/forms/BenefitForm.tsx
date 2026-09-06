@@ -12,7 +12,13 @@ import { benefitSchema } from "@/lib/validation";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { Field } from "@/components/forms/Field";
 import { FormActions } from "@/components/forms/FormActions";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 
@@ -72,19 +78,33 @@ export function BenefitForm({
       setValues((current) => ({ ...current, name: "", totalValue: "" }));
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Something went wrong.");
+      setError(
+        caught instanceof Error ? caught.message : "Something went wrong.",
+      );
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!pending) onOpenChange(nextOpen);
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add benefit</DialogTitle>
+          <DialogDescription>
+            Keep track of a credit or perk and when it resets.
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={submit} className="grid gap-4">
+        <form
+          onSubmit={submit}
+          className="grid gap-design-sm"
+          aria-busy={pending}
+        >
           {error && <ErrorBanner message={error} />}
           <Field label="Benefit name">
             <Input
