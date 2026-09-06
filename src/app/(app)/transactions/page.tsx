@@ -15,7 +15,9 @@ export const metadata = { title: "Transactions - Cardinal" };
 
 const PAGE_SIZE = 25;
 
-export default async function TransactionsPage({ searchParams }: PageProps<"/transactions">) {
+export default async function TransactionsPage({
+  searchParams,
+}: PageProps<"/transactions">) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
@@ -59,7 +61,9 @@ export default async function TransactionsPage({ searchParams }: PageProps<"/tra
       take: PAGE_SIZE,
       include: {
         card: { select: { name: true, cardTheme: true } },
-        rewards: { select: { rewardAmount: true, rewardType: true, multiplier: true } },
+        rewards: {
+          select: { rewardAmount: true, rewardType: true, multiplier: true },
+        },
       },
     }),
   ]);
@@ -67,7 +71,14 @@ export default async function TransactionsPage({ searchParams }: PageProps<"/tra
 
   const pageLink = (targetPage: number) => {
     const next = new URLSearchParams();
-    for (const key of ["cardId", "category", "status", "search", "from", "to"]) {
+    for (const key of [
+      "cardId",
+      "category",
+      "status",
+      "search",
+      "from",
+      "to",
+    ]) {
       const value = first(query[key]);
       if (value) next.set(key, value);
     }
@@ -77,25 +88,44 @@ export default async function TransactionsPage({ searchParams }: PageProps<"/tra
   };
 
   return (
-    <div className="page-stack">
+    <div className="page-shell page-stack">
       <PageHeader
         eyebrow="Activity"
-        title="Transactions"
-        description={`${total} ${total === 1 ? "transaction" : "transactions"} across your active cards. Search, filter, and review earned rewards.`}
+        title="Follow the everyday."
+        description="Every purchase, refund, and reward. A little more context for your spending."
         actions={<AddTransactionButton cards={cards} />}
       />
 
-      <section className="panel overflow-hidden" aria-label="Transaction history">
-        <div className="border-b border-border p-4 sm:p-5">
+      <section
+        className="panel overflow-hidden"
+        aria-label="Transaction history"
+      >
+        <div className="border-b border-border p-4 sm:p-6">
           <TransactionFilters cards={cards} />
         </div>
-        <div className="px-4 sm:px-5">
-          <TransactionTable transactions={transactions} allowDelete />
+        <div className="px-4 sm:px-6">
+          <p
+            className="border-b border-border py-4 text-xs text-muted-foreground"
+            aria-live="polite"
+          >
+            {total} {total === 1 ? "transaction" : "transactions"}
+            {total > 0 ? ` · Page ${page} of ${totalPages}` : ""}
+          </p>
+          <TransactionTable
+            transactions={transactions}
+            filtered={Boolean(
+              cardId || category || status || search || from || to,
+            )}
+            allowDelete
+          />
         </div>
       </section>
 
       {totalPages > 1 && (
-        <nav aria-label="Transaction pages" className="flex items-center justify-center gap-3">
+        <nav
+          aria-label="Transaction pages"
+          className="flex items-center justify-center gap-3"
+        >
           <Button
             variant="outline"
             size="sm"
@@ -113,7 +143,9 @@ export default async function TransactionsPage({ searchParams }: PageProps<"/tra
             size="sm"
             disabled={page >= totalPages}
             nativeButton={page >= totalPages}
-            render={page < totalPages ? <Link href={pageLink(page + 1)} /> : undefined}
+            render={
+              page < totalPages ? <Link href={pageLink(page + 1)} /> : undefined
+            }
           >
             Next
           </Button>
