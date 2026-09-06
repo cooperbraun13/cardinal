@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { ArrowRightIcon, LoaderCircleIcon } from "lucide-react";
 import { useState } from "react";
 import { apiFetch } from "@/lib/client";
 import { CATEGORIES, categoryLabel } from "@/lib/categories";
@@ -34,29 +36,35 @@ export function BestCardWidget() {
     event.preventDefault();
     setError("");
     setLoading(true);
+    setResult(null);
     try {
-      const response = await apiFetch<RecommendResponse>("/api/recommend-card", {
-        method: "POST",
-        body: { category, amount: Number(amount) },
-      });
+      const response = await apiFetch<RecommendResponse>(
+        "/api/recommend-card",
+        {
+          method: "POST",
+          body: { category, amount: Number(amount) },
+        },
+      );
       setResult(response);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Something went wrong.");
+      setError(
+        caught instanceof Error ? caught.message : "Something went wrong.",
+      );
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <section className="panel p-5 sm:p-6" aria-labelledby="best-card-heading">
-      <h2 id="best-card-heading" className="text-base font-semibold tracking-[-0.02em]">
-        Best card to use
+    <section className="panel panel-body" aria-labelledby="best-card-heading">
+      <h2 id="best-card-heading" className="text-lg font-medium tracking-tight">
+        A better card for your next purchase
       </h2>
       <p className="mt-1 text-xs leading-5 text-muted-foreground">
         Compare the reward value before you buy.
       </p>
 
-      <form onSubmit={recommend} className="mt-4">
+      <form onSubmit={recommend} className="mt-6">
         <div className="grid grid-cols-[minmax(0,1fr)_6.5rem] gap-2">
           <NativeSelect
             value={category}
@@ -89,28 +97,39 @@ export function BestCardWidget() {
           disabled={loading || !amount || Number(amount) <= 0}
           className="mt-3 w-full"
         >
-          {loading ? "Checking..." : "Recommend a card"}
+          {loading && <LoaderCircleIcon className="size-4 animate-spin" />}
+          {loading ? "Checking..." : "Find my best card"}
         </Button>
       </form>
 
       {error && <ErrorBanner message={error} className="mt-3" />}
-      <div aria-live="polite">
+      <div aria-live="polite" aria-busy={loading}>
         {result &&
           (result.recommendation ? (
             <div className="mt-4 border-t border-border pt-4">
-              <p className="eyebrow text-primary">Recommended</p>
-              <p className="mt-2 text-base font-semibold">{result.recommendation.cardName}</p>
-              <p className="mt-1 text-sm font-semibold text-primary">
-                {result.recommendation.rewardRate}x - {formatEstimate(result.recommendation)}
+              <p className="eyebrow text-foreground">Recommended</p>
+              <p className="mt-2 text-base font-semibold">
+                {result.recommendation.cardName}
+              </p>
+              <p className="mt-1 text-sm font-semibold text-foreground">
+                {result.recommendation.rewardRate}
+                {result.recommendation.rewardType === "cashback"
+                  ? "%"
+                  : "x"} · {formatEstimate(result.recommendation)}
               </p>
               <p className="mt-2 text-xs leading-5 text-muted-foreground">
                 {result.recommendation.explanation}
               </p>
             </div>
           ) : (
-            <p className="mt-3 text-xs text-muted-foreground">{result.message}</p>
+            <p className="mt-3 text-xs text-muted-foreground">
+              {result.message}
+            </p>
           ))}
       </div>
+      <Link href="/optimizer" className="text-link mt-4">
+        Explore the optimizer <ArrowRightIcon className="size-4" />
+      </Link>
     </section>
   );
 }
