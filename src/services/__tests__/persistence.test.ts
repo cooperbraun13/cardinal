@@ -13,6 +13,7 @@ vi.mock("next/headers", () => ({ cookies: async () => ({
 
 import { createTransactionWithEffects, updateTransactionWithEffects, deleteTransactionWithEffects } from "@/services/transactions";
 import { updateBenefit } from "@/services/benefit-updates";
+import { createRewardRule, deleteRewardRule } from "@/services/reward-rules";
 import { createSession, getCurrentUser, destroySession } from "@/lib/auth";
 import { getCandidateCards, getDashboardData } from "@/services/data";
 import * as transactionRoutes from "@/app/api/transactions/route";
@@ -113,6 +114,19 @@ describe("transaction persistence", () => {
     expect(await db.transaction.count()).toBe(successful.length);
     expect((await db.card.findUniqueOrThrow({ where: { id: cardId } })).currentBalance)
       .toBe(50 + successful.reduce((sum, transaction) => sum + transaction.amount, 0));
+  });
+
+  it("reconciles reward snapshots immediately when rules change", async () => {
+    const transaction = await createTransactionWithEffects(userId, input());
+    const reward = () => db.reward.findFirstOrThrow({ where: { transactionId: transaction.id } });
+    expect((await reward()).rewardAmount).toBe(100);
+    const rule = await createRewardRule(userId, cardId, {
+      category: "dining", multiplier: 5, startDate: null, endDate: null,
+      spendingCap: null, notes: null,
+    });
+    expect((await reward()).rewardAmount).toBe(500);
+    await deleteRewardRule(userId, rule.id);
+    expect((await reward()).rewardAmount).toBe(100);
   });
 });
 

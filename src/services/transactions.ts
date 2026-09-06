@@ -15,7 +15,11 @@ const balanceEffect = (transaction: Pick<Transaction, "amount" | "isRefund">) =>
  * Caps count gross posted purchases in each rule's window. Unlinked refunds are estimates
  * at their own date's rate and do not restore cap allowance.
  */
-async function syncRewards(db: Prisma.TransactionClient, card: OwnedCard, from: Date) {
+export async function syncCardRewards(
+  db: Prisma.TransactionClient,
+  card: OwnedCard,
+  from: Date = new Date(0)
+) {
   const history = await db.transaction.findMany({
     where: { cardId: card.id },
     orderBy: [{ transactionDate: "asc" }, { createdAt: "asc" }, { id: "asc" }],
@@ -50,7 +54,7 @@ export async function createTransactionWithEffects(userId: string, data: Transac
     const transaction = await db.transaction.create({ data: { ...data, userId } });
     await db.card.update({ where: { id: card.id },
       data: { currentBalance: cents(card.currentBalance + balanceEffect(transaction)) } });
-    await syncRewards(db, card, transaction.transactionDate);
+    await syncCardRewards(db, card, transaction.transactionDate);
     return transaction;
   });
 }
@@ -66,7 +70,7 @@ export async function updateTransactionWithEffects(userId: string, id: string, d
     const financialChange = updated.amount !== existing.amount || updated.category !== existing.category ||
       updated.isRefund !== existing.isRefund || updated.status !== existing.status ||
       updated.transactionDate.getTime() !== existing.transactionDate.getTime();
-    if (financialChange) await syncRewards(db, card,
+    if (financialChange) await syncCardRewards(db, card,
       new Date(Math.min(existing.transactionDate.getTime(), updated.transactionDate.getTime())));
     return updated;
   });
@@ -79,6 +83,6 @@ export async function deleteTransactionWithEffects(userId: string, id: string) {
     await db.transaction.delete({ where: { id } });
     await db.card.update({ where: { id: card.id },
       data: { currentBalance: cents(card.currentBalance - balanceEffect(transaction)) } });
-    await syncRewards(db, card, transaction.transactionDate);
+    await syncCardRewards(db, card, transaction.transactionDate);
   });
 }
