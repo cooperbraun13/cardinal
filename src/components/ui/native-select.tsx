@@ -10,11 +10,11 @@ export function NativeSelect({
   ...props
 }: React.ComponentProps<"select"> & { wrapperClassName?: string }) {
   return (
-    <div className={cn("relative", wrapperClassName)}>
+    <div className={cn("relative min-w-0", wrapperClassName)}>
       <select
         className={cn(
-          "h-10 w-full appearance-none rounded-lg border border-input bg-background/40 py-2 pr-9 pl-3 text-sm transition-[background-color,border-color] outline-none hover:border-foreground/20 focus-visible:border-ring focus-visible:bg-background/65 focus-visible:ring-2 focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:opacity-50 [&>option]:bg-popover [&>option]:text-popover-foreground",
-          className
+          "h-12 w-full min-w-0 appearance-none rounded-sm border border-input bg-background py-2 pr-9 pl-3 text-base md:text-sm transition-[background-color,border-color] outline-none hover:border-foreground focus-visible:border-ring focus-visible:bg-background/65 focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>option]:bg-popover [&>option]:text-popover-foreground",
+          className,
         )}
         {...props}
       >

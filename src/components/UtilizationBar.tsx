@@ -18,12 +18,16 @@ export function UtilizationBar({
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(clamped)}
-      className={cn("h-1.5 w-full overflow-hidden rounded-full bg-white/10", trackClassName, className)}
+      className={cn(
+        "h-1.5 w-full overflow-hidden rounded-none bg-white/10",
+        trackClassName,
+        className,
+      )}
     >
       <div
         className={cn(
-          "h-full rounded-full transition-all duration-500",
-          clamped >= 30 ? "bg-primary" : "bg-white/85"
+          "h-full rounded-none transition-all duration-500",
+          clamped >= 30 ? "bg-primary" : "bg-white/85",
         )}
         style={{ width: `${clamped}%` }}
       />
