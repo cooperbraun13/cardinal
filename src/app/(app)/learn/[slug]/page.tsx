@@ -1,9 +1,28 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getLessonBySlug } from "@/features/learn/content";
 
 type Params = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { slug } = await params;
+  const lesson = getLessonBySlug(slug);
+
+  if (!lesson) {
+    return {
+      title: "Lesson not found - Cardinal",
+      description: "This Cardinal lesson is unavailable.",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  return {
+    title: `${lesson.title} - Cardinal`,
+    description: lesson.summary,
+  };
+}
 
 export default async function LessonPage({ params }: Params) {
   const { slug } = await params;
