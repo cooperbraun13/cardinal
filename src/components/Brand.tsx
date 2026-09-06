@@ -17,6 +17,7 @@ export function Brand({
           fill
           sizes="48px"
           className="scale-[1.45] object-contain mix-blend-screen"
+          unoptimized
           priority
         />
       </span>
