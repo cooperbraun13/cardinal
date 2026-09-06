@@ -1,40 +1,43 @@
 import { categoryLabel } from "@/lib/categories";
 import { formatCurrency } from "@/lib/format";
 
-/** Spending breakdown — label, proportional red bar, right-aligned amount. */
 export function SpendingCategoryChart({
   data,
 }: {
   data: { category: string; amount: number }[];
 }) {
-  if (data.length === 0) {
+  if (data.length === 0)
     return (
-      <p className="py-4 text-sm text-muted-foreground">
-        No spending yet this month. Add transactions to see the breakdown.
+      <p className="border-t border-border pt-5 text-sm leading-6 text-muted-foreground">
+        No posted spending this month. Your category breakdown will appear here.
       </p>
     );
-  }
-  const max = Math.max(...data.map((d) => d.amount));
+  const max = Math.max(...data.map((item) => item.amount), 1);
   return (
-    <div className="space-y-3.5" role="list" aria-label="Spending by category">
-      {data.slice(0, 6).map((d) => (
-        <div
-          key={d.category}
-          role="listitem"
-          className="grid grid-cols-[5.5rem_minmax(4rem,1fr)_auto] items-center gap-3 sm:gap-4"
-        >
-          <span className="truncate text-sm text-foreground/85">{categoryLabel(d.category)}</span>
-          <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+    <ul className="grid gap-4" aria-label="Spending by category">
+      {data.slice(0, 6).map((item, index) => (
+        <li key={item.category}>
+          <div className="mb-2 flex justify-between gap-3 text-xs">
+            <span>{categoryLabel(item.category)}</span>
+            <span className="tabular-nums text-muted-foreground">
+              {formatCurrency(item.amount)}
+            </span>
+          </div>
+          <div
+            className="h-1.5 overflow-hidden rounded-none bg-muted"
+            aria-hidden="true"
+          >
             <div
-              className="h-full rounded-full bg-primary transition-[width] duration-300"
-              style={{ width: `${Math.max(4, (d.amount / max) * 100)}%` }}
+              className={
+                index === 0
+                  ? "h-full rounded-none bg-foreground/80"
+                  : "h-full rounded-none bg-foreground/30"
+              }
+              style={{ width: `${Math.max(0, (item.amount / max) * 100)}%` }}
             />
           </div>
-          <span className="text-xs tabular-nums text-muted-foreground sm:text-sm">
-            {formatCurrency(d.amount)}
-          </span>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckIcon } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/client";
@@ -13,6 +14,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -60,7 +62,9 @@ export function CardForm({
   const [values, setValues] = useState<CardFormValues>(initial ?? EMPTY);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
-  const [dirtyFields, setDirtyFields] = useState<Set<keyof CardFormValues>>(() => new Set());
+  const [dirtyFields, setDirtyFields] = useState<Set<keyof CardFormValues>>(
+    () => new Set(),
+  );
   const isEdit = Boolean(initial?.id);
 
   function set<K extends keyof CardFormValues>(key: K, value: string) {
@@ -85,9 +89,13 @@ export function CardForm({
       cardTheme: values.cardTheme,
     };
     // Send only fields the user touched; refreshed props must not turn stale values into edits.
-    const changes = initial ? Object.fromEntries(Object.entries(input).filter(
-      ([key]) => dirtyFields.has(key as keyof CardFormValues)
-    )) : input;
+    const changes = initial
+      ? Object.fromEntries(
+          Object.entries(input).filter(([key]) =>
+            dirtyFields.has(key as keyof CardFormValues),
+          ),
+        )
+      : input;
     const parsed = (isEdit ? cardUpdateSchema : cardSchema).safeParse(changes);
 
     if (!parsed.success) {
@@ -105,21 +113,36 @@ export function CardForm({
       if (!isEdit) setValues(EMPTY);
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Something went wrong.");
+      setError(
+        caught instanceof Error ? caught.message : "Something went wrong.",
+      );
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!pending) onOpenChange(nextOpen);
+      }}
+    >
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit card" : "Add a card"}</DialogTitle>
+          <DialogDescription>
+            Add the details from your card account. You can update them anytime.
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={submit} className="grid gap-4">
+        <form
+          onSubmit={submit}
+          className="grid gap-design-sm"
+          aria-busy={pending}
+        >
           {error && <ErrorBanner message={error} />}
-          <div className="grid gap-4 sm:grid-cols-2">
+          <fieldset className="grid gap-4 sm:grid-cols-2">
+            <legend className="mb-4 text-sm font-medium">Card identity</legend>
             <Field label="Card name">
               <Input
                 value={values.name}
@@ -144,7 +167,9 @@ export function CardForm({
                 <option value="">None</option>
                 {NETWORKS.map((network) => (
                   <option key={network} value={network}>
-                    {network === "amex" ? "Amex" : network[0].toUpperCase() + network.slice(1)}
+                    {network === "amex"
+                      ? "Amex"
+                      : network[0].toUpperCase() + network.slice(1)}
                   </option>
                 ))}
               </NativeSelect>
@@ -153,12 +178,20 @@ export function CardForm({
               <Input
                 value={values.lastFour}
                 onChange={(event) =>
-                  set("lastFour", event.target.value.replace(/\D/g, "").slice(0, 4))
+                  set(
+                    "lastFour",
+                    event.target.value.replace(/\D/g, "").slice(0, 4),
+                  )
                 }
                 placeholder="1234"
                 inputMode="numeric"
               />
             </Field>
+          </fieldset>
+          <fieldset className="grid gap-4 border-t border-border pt-5 sm:grid-cols-2">
+            <legend className="pr-3 text-sm font-medium">
+              Balances & account details
+            </legend>
             <Field label="Credit limit ($)">
               <Input
                 type="number"
@@ -213,9 +246,12 @@ export function CardForm({
                 required
               />
             </Field>
-          </div>
+          </fieldset>
 
-          <Field label="Card theme">
+          <fieldset>
+            <legend className="mb-3 text-xs font-medium">
+              Card appearance
+            </legend>
             <div className="flex flex-wrap gap-2">
               {CARD_THEMES.map((theme) => (
                 <button
@@ -223,16 +259,25 @@ export function CardForm({
                   type="button"
                   onClick={() => set("cardTheme", theme)}
                   aria-label={`${theme} card theme`}
+                  title={theme[0].toUpperCase() + theme.slice(1)}
                   aria-pressed={values.cardTheme === theme}
                   className={cn(
                     `card-theme-${theme}`,
-                    "h-9 w-13 rounded-lg border border-white/10 transition-[transform,border-color] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none",
-                    values.cardTheme === theme && "border-white/70 ring-2 ring-white/30"
+                    "flex h-12 w-14 items-center justify-center rounded-none border border-white/10 transition-colors hover:border-white/50 focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none",
+                    values.cardTheme === theme &&
+                      "border-white/70 ring-2 ring-white/30",
                   )}
-                />
+                >
+                  {values.cardTheme === theme && (
+                    <CheckIcon
+                      className="size-4 text-white"
+                      aria-hidden="true"
+                    />
+                  )}
+                </button>
               ))}
             </div>
-          </Field>
+          </fieldset>
 
           <FormActions
             onCancel={() => onOpenChange(false)}

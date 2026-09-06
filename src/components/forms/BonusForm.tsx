@@ -8,7 +8,13 @@ import { signupBonusSchema } from "@/lib/validation";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { Field } from "@/components/forms/Field";
 import { FormActions } from "@/components/forms/FormActions";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 
@@ -60,19 +66,35 @@ export function BonusForm({
       onOpenChange(false);
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Something went wrong.");
+      setError(
+        caught instanceof Error ? caught.message : "Something went wrong.",
+      );
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!pending) onOpenChange(nextOpen);
+      }}
+    >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{initial ? "Edit signup bonus" : "Set signup bonus"}</DialogTitle>
+          <DialogTitle>
+            {initial ? "Edit signup bonus" : "Set signup bonus"}
+          </DialogTitle>
+          <DialogDescription>
+            Track eligible spending toward your card’s welcome offer.
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={submit} className="grid gap-4">
+        <form
+          onSubmit={submit}
+          className="grid gap-design-sm"
+          aria-busy={pending}
+        >
           {error && <ErrorBanner message={error} />}
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Spend requirement ($)">
@@ -81,7 +103,9 @@ export function BonusForm({
                 min="1"
                 step="1"
                 value={values.spendRequirement}
-                onChange={(event) => set("spendRequirement", event.target.value)}
+                onChange={(event) =>
+                  set("spendRequirement", event.target.value)
+                }
                 placeholder="4000"
                 required
               />
@@ -104,7 +128,9 @@ export function BonusForm({
               >
                 {REWARD_TYPES.map((type) => (
                   <option key={type} value={type}>
-                    {type === "cashback" ? "Cash back" : type[0].toUpperCase() + type.slice(1)}
+                    {type === "cashback"
+                      ? "Cash back"
+                      : type[0].toUpperCase() + type.slice(1)}
                   </option>
                 ))}
               </NativeSelect>

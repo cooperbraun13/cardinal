@@ -10,11 +10,11 @@ export default async function OptimizerPage() {
   if (!user) redirect("/login");
 
   return (
-    <div className="page-stack">
+    <div className="page-shell page-stack">
       <PageHeader
-        eyebrow="Rewards"
-        title="Card optimizer"
-        description="Compare your active cards for a purchase and see the strongest reward rate, estimated value, promotions, and alternatives."
+        eyebrow="Card optimizer"
+        title="Make the most of your next purchase."
+        description="One purchase. Your cards, compared. Find the reward that goes further."
       />
       <OptimizerView />
     </div>

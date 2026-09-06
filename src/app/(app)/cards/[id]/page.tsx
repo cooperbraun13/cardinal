@@ -4,7 +4,11 @@ import { ArrowLeftIcon } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatCurrency, formatDate, nextOccurrence } from "@/lib/format";
-import { benefitRemaining, benefitStatus, effectiveExpiry } from "@/services/benefits";
+import {
+  benefitRemaining,
+  benefitStatus,
+  effectiveExpiry,
+} from "@/services/benefits";
 import { bonusProgress, eligibleSpend } from "@/services/bonuses";
 import { utilization } from "@/services/rewards";
 import { AddTransactionButton } from "@/components/AddButtons";
@@ -21,11 +25,14 @@ import { PageHeader } from "@/components/PageHeader";
 import { SectionHeader } from "@/components/SectionHeader";
 import { SignupBonusProgress } from "@/components/SignupBonusProgress";
 import { TransactionTable } from "@/components/TransactionTable";
+import { EmptyState } from "@/components/EmptyState";
 import { UtilizationBar } from "@/components/UtilizationBar";
 
 export const metadata = { title: "Card details - Cardinal" };
 
-export default async function CardDetailPage({ params }: PageProps<"/cards/[id]">) {
+export default async function CardDetailPage({
+  params,
+}: PageProps<"/cards/[id]">) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   const { id } = await params;
@@ -53,7 +60,12 @@ export default async function CardDetailPage({ params }: PageProps<"/cards/[id]"
   if (bonus) {
     const transactions = await prisma.transaction.findMany({
       where: { cardId: card.id },
-      select: { amount: true, status: true, isRefund: true, transactionDate: true },
+      select: {
+        amount: true,
+        status: true,
+        isRefund: true,
+        transactionDate: true,
+      },
     });
     const spend = eligibleSpend(transactions, {
       openedAt: card.openedAt,
@@ -69,12 +81,12 @@ export default async function CardDetailPage({ params }: PageProps<"/cards/[id]"
   }
 
   return (
-    <div className="page-stack">
+    <div className="page-shell page-stack">
       <PageHeader
         eyebrow={
           <Link
             href="/cards"
-            className="inline-flex items-center gap-1.5 transition-colors hover:text-primary focus-visible:rounded focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none"
+            className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground hover:underline focus-visible:rounded focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none"
           >
             <ArrowLeftIcon className="size-3.5" />
             All cards
@@ -105,7 +117,9 @@ export default async function CardDetailPage({ params }: PageProps<"/cards/[id]"
                 annualFee: String(card.annualFee),
                 statementDay: String(card.statementDay),
                 dueDay: String(card.dueDay),
-                openedAt: card.openedAt ? card.openedAt.toISOString().slice(0, 10) : "",
+                openedAt: card.openedAt
+                  ? card.openedAt.toISOString().slice(0, 10)
+                  : "",
                 cardTheme: card.cardTheme,
               }}
             />
@@ -113,14 +127,19 @@ export default async function CardDetailPage({ params }: PageProps<"/cards/[id]"
         }
       />
 
-      <section className="grid items-start gap-6 xl:grid-cols-[24rem_minmax(0,1fr)]">
+      <section className="grid items-start gap-design-md xl:grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)]">
         <CreditCardTile card={card} />
-        <div className="border-y border-border py-6">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-6 lg:grid-cols-4">
-            <Metric label="Balance" value={formatCurrency(card.currentBalance)} />
+        <div className="panel panel-body">
+          <div className="grid gap-design-sm sm:grid-cols-2">
+            <Metric
+              label="Balance"
+              value={formatCurrency(card.currentBalance)}
+            />
             <Metric
               label="Available credit"
-              value={formatCurrency(Math.max(0, card.creditLimit - card.currentBalance))}
+              value={formatCurrency(
+                Math.max(0, card.creditLimit - card.currentBalance),
+              )}
               detail={`${formatCurrency(card.creditLimit)} limit`}
             />
             <Metric
@@ -130,14 +149,18 @@ export default async function CardDetailPage({ params }: PageProps<"/cards/[id]"
             />
             <Metric
               label="Annual fee"
-              value={card.annualFee > 0 ? formatCurrency(card.annualFee) : "None"}
+              value={
+                card.annualFee > 0 ? formatCurrency(card.annualFee) : "None"
+              }
             />
           </div>
 
           <div className="mt-6 border-t border-border pt-6">
             <div className="mb-3 flex items-center justify-between gap-4 text-xs">
               <span className="font-medium">Credit utilization</span>
-              <span className="font-semibold tabular-nums">{utilizationRate.toFixed(1)}%</span>
+              <span className="font-semibold tabular-nums">
+                {utilizationRate.toFixed(1)}%
+              </span>
             </div>
             <UtilizationBar
               value={utilizationRate}
@@ -145,31 +168,36 @@ export default async function CardDetailPage({ params }: PageProps<"/cards/[id]"
               trackClassName="bg-muted"
             />
           </div>
-
-          <div className="mt-6 border-t border-border pt-6">
-            <SectionHeader
-              className="mb-3"
-              title="Reward categories"
-              description="Active earning rates and promotional windows"
-            />
-            <RewardRules cardId={card.id} rules={card.rewardCategories} />
-          </div>
         </div>
       </section>
+      <section className="panel panel-body" aria-label="Reward categories">
+        <SectionHeader
+          className="mb-design-sm"
+          title="How this card earns"
+          description="Your earning rules, promotional windows, and spending caps"
+        />
+        <RewardRules cardId={card.id} rules={card.rewardCategories} />
+      </section>
 
-      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(22rem,0.85fr)]">
+      <div className="grid min-w-0 items-start gap-design-md xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
         <section aria-labelledby="card-transactions-heading">
           <SectionHeader
             className="mb-4"
-            title={<span id="card-transactions-heading">Recent transactions</span>}
+            title={
+              <span id="card-transactions-heading">Recent transactions</span>
+            }
             description="The 10 latest purchases and refunds on this card"
           />
           <div className="panel px-5">
-            <TransactionTable transactions={card.transactions} showCard={false} allowDelete />
+            <TransactionTable
+              transactions={card.transactions}
+              showCard={false}
+              allowDelete
+            />
           </div>
         </section>
 
-        <div className="grid gap-6">
+        <div className="grid gap-design-sm">
           <section aria-labelledby="card-benefits-heading">
             <SectionHeader
               className="mb-4"
@@ -178,9 +206,11 @@ export default async function CardDetailPage({ params }: PageProps<"/cards/[id]"
               action={<AddBenefitButton cardId={card.id} />}
             />
             {card.benefits.length === 0 ? (
-              <div className="panel p-5 text-sm text-muted-foreground">
-                No benefits tracked for this card yet.
-              </div>
+              <EmptyState
+                title="Make room for the extras"
+                description="Add a credit or perk to keep its value and expiration in view."
+                className="panel"
+              />
             ) : (
               <div className="grid gap-3">
                 {card.benefits.map((benefit) => (
@@ -222,9 +252,11 @@ export default async function CardDetailPage({ params }: PageProps<"/cards/[id]"
             {bonusView ? (
               <SignupBonusProgress bonus={bonusView} />
             ) : (
-              <div className="panel p-5 text-sm text-muted-foreground">
-                No signup bonus tracked for this card.
-              </div>
+              <EmptyState
+                title="Something to work toward"
+                description="Add your welcome offer to follow your eligible spending progress."
+                className="panel"
+              />
             )}
           </section>
         </div>

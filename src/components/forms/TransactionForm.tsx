@@ -8,7 +8,13 @@ import { transactionSchema } from "@/lib/validation";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { Field } from "@/components/forms/Field";
 import { FormActions } from "@/components/forms/FormActions";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 
@@ -37,7 +43,10 @@ export function TransactionForm({
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
 
-  function set<K extends keyof typeof values>(key: K, value: (typeof values)[K]) {
+  function set<K extends keyof typeof values>(
+    key: K,
+    value: (typeof values)[K],
+  ) {
     setValues((current) => ({ ...current, [key]: value }));
   }
 
@@ -52,24 +61,47 @@ export function TransactionForm({
 
     setPending(true);
     try {
-      await apiFetch("/api/transactions", { method: "POST", body: parsed.data });
+      await apiFetch("/api/transactions", {
+        method: "POST",
+        body: parsed.data,
+      });
       onOpenChange(false);
-      setValues((current) => ({ ...current, merchant: "", amount: "", isRefund: false }));
+      setValues((current) => ({
+        ...current,
+        merchant: "",
+        amount: "",
+        isRefund: false,
+      }));
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Something went wrong.");
+      setError(
+        caught instanceof Error ? caught.message : "Something went wrong.",
+      );
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!pending) onOpenChange(nextOpen);
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add transaction</DialogTitle>
+          <DialogDescription>
+            Record a purchase or refund to keep your balances and rewards up to
+            date.
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={submit} className="grid gap-4">
+        <form
+          onSubmit={submit}
+          className="grid gap-design-sm"
+          aria-busy={pending}
+        >
           {error && <ErrorBanner message={error} />}
           <Field label="Card">
             <NativeSelect
@@ -135,7 +167,9 @@ export function TransactionForm({
             <Field label="Type">
               <NativeSelect
                 value={values.isRefund ? "refund" : "purchase"}
-                onChange={(event) => set("isRefund", event.target.value === "refund")}
+                onChange={(event) =>
+                  set("isRefund", event.target.value === "refund")
+                }
               >
                 <option value="purchase">Purchase</option>
                 <option value="refund">Refund</option>

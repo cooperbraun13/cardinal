@@ -16,17 +16,21 @@ export function Metric({
   className?: string;
 }) {
   return (
-    <div className={cn("min-w-0", className)}>
-      <p className="text-xs font-medium text-muted-foreground">{label}</p>
+    <div className={cn("min-w-0 break-words", className)}>
+      <p className="eyebrow">{label}</p>
       <p
         className={cn(
-          "mt-2 font-semibold tracking-[-0.035em] tabular-nums",
-          emphasis ? "text-3xl sm:text-4xl" : "text-xl sm:text-2xl"
+          "mt-design-xs font-medium tracking-[-0.02em] tabular-nums",
+          emphasis ? "display-number" : "text-[26px] sm:text-[36px]",
         )}
       >
         {value}
       </p>
-      {detail && <div className="mt-1.5 text-xs leading-5 text-muted-foreground">{detail}</div>}
+      {detail && (
+        <div className="mt-1.5 text-xs leading-5 text-muted-foreground">
+          {detail}
+        </div>
+      )}
       {children}
     </div>
   );

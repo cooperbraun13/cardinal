@@ -1,14 +1,21 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTransition } from "react";
+import { Field } from "@/components/forms/Field";
 import { SearchIcon, XIcon } from "lucide-react";
 import { CATEGORIES, categoryLabel } from "@/lib/categories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 
-export function TransactionFilters({ cards }: { cards: { id: string; name: string }[] }) {
+export function TransactionFilters({
+  cards,
+}: {
+  cards: { id: string; name: string }[];
+}) {
   const router = useRouter();
+  const [pending, startTransition] = useTransition();
   const pathname = usePathname();
   const params = useSearchParams();
   function apply(updates: Record<string, string>) {
@@ -19,85 +26,122 @@ export function TransactionFilters({ cards }: { cards: { id: string; name: strin
     }
     next.delete("page");
     const query = next.toString();
-    router.push(query ? `${pathname}?${query}` : pathname);
+    startTransition(() =>
+      router.push(query ? `${pathname}?${query}` : pathname),
+    );
   }
 
-  const hasFilters = ["search", "cardId", "category", "status", "from", "to"].some((key) =>
-    params.has(key)
-  );
+  const hasFilters = [
+    "search",
+    "cardId",
+    "category",
+    "status",
+    "from",
+    "to",
+  ].some((key) => params.has(key));
 
   return (
-    <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(12rem,1.4fr)_repeat(3,minmax(8rem,1fr))_9rem_9rem_auto]">
+    <div
+      className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+      aria-busy={pending}
+    >
       <form
         onSubmit={(event) => {
           event.preventDefault();
           const form = new FormData(event.currentTarget);
           apply({ search: String(form.get("search") ?? "") });
         }}
-        className="relative sm:col-span-2 xl:col-span-1"
+        className="sm:col-span-2 xl:col-span-3"
       >
-        <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          key={params.get("search") ?? ""}
-          name="search"
-          defaultValue={params.get("search") ?? ""}
-          placeholder="Search merchant..."
-          className="pl-9"
-          aria-label="Search merchant"
-        />
+        <label
+          htmlFor="activity-search"
+          className="mb-2 block text-xs font-medium text-foreground/85"
+        >
+          Search activity
+        </label>
+        <div className="relative">
+          <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            id="activity-search"
+            key={params.get("search") ?? ""}
+            name="search"
+            defaultValue={params.get("search") ?? ""}
+            placeholder="Search merchant..."
+            className="pr-24 pl-9"
+          />
+          <Button
+            type="submit"
+            variant="ghost"
+            size="sm"
+            className="absolute top-0 right-0"
+            disabled={pending}
+          >
+            {pending ? "Searching..." : "Search"}
+          </Button>
+        </div>
       </form>
 
-      <NativeSelect
-        value={params.get("cardId") ?? ""}
-        onChange={(event) => apply({ cardId: event.target.value })}
-        aria-label="Filter by card"
-        wrapperClassName="w-full"
-      >
-        <option value="">All cards</option>
-        {cards.map((card) => (
-          <option key={card.id} value={card.id}>
-            {card.name}
-          </option>
-        ))}
-      </NativeSelect>
+      <Field label="Card">
+        <NativeSelect
+          value={params.get("cardId") ?? ""}
+          onChange={(event) => apply({ cardId: event.target.value })}
+          aria-label="Filter by card"
+          wrapperClassName="w-full"
+        >
+          <option value="">All cards</option>
+          {cards.map((card) => (
+            <option key={card.id} value={card.id}>
+              {card.name}
+            </option>
+          ))}
+        </NativeSelect>
+      </Field>
 
-      <NativeSelect
-        value={params.get("category") ?? ""}
-        onChange={(event) => apply({ category: event.target.value })}
-        aria-label="Filter by category"
-        wrapperClassName="w-full"
-      >
-        <option value="">All categories</option>
-        {CATEGORIES.map((category) => (
-          <option key={category} value={category}>
-            {categoryLabel(category)}
-          </option>
-        ))}
-      </NativeSelect>
+      <Field label="Category">
+        <NativeSelect
+          value={params.get("category") ?? ""}
+          onChange={(event) => apply({ category: event.target.value })}
+          aria-label="Filter by category"
+          wrapperClassName="w-full"
+        >
+          <option value="">All categories</option>
+          {CATEGORIES.map((category) => (
+            <option key={category} value={category}>
+              {categoryLabel(category)}
+            </option>
+          ))}
+        </NativeSelect>
+      </Field>
 
-      <NativeSelect
-        value={params.get("status") ?? ""}
-        onChange={(event) => apply({ status: event.target.value })}
-        aria-label="Filter by status"
-        wrapperClassName="w-full"
-      >
-        <option value="">Any status</option>
-        <option value="posted">Posted</option>
-        <option value="pending">Pending</option>
-      </NativeSelect>
+      <Field label="Status">
+        <NativeSelect
+          value={params.get("status") ?? ""}
+          onChange={(event) => apply({ status: event.target.value })}
+          aria-label="Filter by status"
+          wrapperClassName="w-full"
+        >
+          <option value="">Any status</option>
+          <option value="posted">Posted</option>
+          <option value="pending">Pending</option>
+        </NativeSelect>
+      </Field>
 
-      <Input
-        type="date"
-        value={params.get("from") ?? ""}
-        onChange={(event) => apply({ from: event.target.value })}
-        aria-label="From date"
-      />
-      <Input
-        type="date"
-        value={params.get("to") ?? ""}
-        onChange={(event) => apply({ to: event.target.value })}
-        aria-label="To date"
-      />
+      <Field label="From date">
+        <Input
+          type="date"
+          value={params.get("from") ?? ""}
+          onChange={(event) => apply({ from: event.target.value })}
+          aria-label="From date"
+        />
+      </Field>
+      <Field label="To date">
+        <Input
+          type="date"
+          value={params.get("to") ?? ""}
+          onChange={(event) => apply({ to: event.target.value })}
+          aria-label="To date"
+        />
+      </Field>
 
       {hasFilters && (
         <Button
@@ -106,7 +150,7 @@ export function TransactionFilters({ cards }: { cards: { id: string; name: strin
           onClick={() => {
             router.push(pathname);
           }}
-          className="justify-self-start xl:justify-self-end"
+          className="self-end justify-self-start"
         >
           <XIcon className="size-3.5" />
           Clear

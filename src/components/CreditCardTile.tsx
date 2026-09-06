@@ -25,14 +25,6 @@ const NETWORK_LABELS: Record<string, string> = {
   discover: "DISCOVER",
 };
 
-function wholeCurrency(amount: number): string {
-  return amount.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  });
-}
-
 function rewardSummary(card: CreditCardTileData): string {
   const rewards = [...(card.rewardCategories ?? [])]
     .sort((a, b) => b.multiplier - a.multiplier)
@@ -54,69 +46,77 @@ export function CreditCardTile({
   const rewards = rewardSummary(card);
 
   return (
-    <article
-      className={cn(
-        `card-theme-${card.cardTheme}`,
-        "relative aspect-[1.586] w-full min-w-[17.5rem] overflow-hidden rounded-xl border border-white/10 p-4 text-white transition-[transform,border-color] duration-200 group-hover:-translate-y-0.5 group-hover:border-white/25 group-focus-visible:-translate-y-0.5 group-focus-visible:border-white/35 sm:p-5",
-        className
-      )}
-    >
-      <div className="flex h-full flex-col">
-        <div className="flex items-start justify-between gap-4">
+    <article className={cn("min-w-0", className)}>
+      <div
+        className={cn(
+          `card-theme-${card.cardTheme}`,
+          "relative flex min-h-48 flex-col justify-between gap-design-md overflow-hidden rounded-none border border-white/15 p-design-sm text-white transition-[border-color] group-hover:border-white/40 sm:min-h-52 sm:p-6",
+        )}
+      >
+        <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="truncate text-[10px] font-semibold tracking-[0.15em] text-white/80 uppercase">
+            <p className="text-[10px] font-medium tracking-[.16em] text-white/75 uppercase">
               {card.issuer}
             </p>
-            <p className="mt-1 truncate text-base font-semibold tracking-[-0.02em]">{card.name}</p>
+            <h3 className="mt-2 break-words text-lg font-medium tracking-tight">
+              {card.name}
+            </h3>
           </div>
+          <span
+            aria-hidden="true"
+            className="grid h-7 w-9 shrink-0 grid-cols-3 overflow-hidden rounded-sm border border-white/30 bg-white/10"
+          >
+            <span className="border-r border-white/20" />
+            <span className="border-r border-white/20" />
+            <span />
+          </span>
+        </div>
+        <div className="flex items-end justify-between gap-3">
+          <span className="font-mono text-xs tracking-[.15em] text-white/80">
+            •••• {card.lastFour ?? "—"}
+          </span>
           {card.network && (
-            <span className="shrink-0 text-[11px] font-bold tracking-[0.08em] text-white/90">
+            <span className="text-[11px] font-semibold tracking-wider">
               {NETWORK_LABELS[card.network] ?? card.network.toUpperCase()}
             </span>
           )}
         </div>
-
-        <div className="my-auto flex items-center gap-3 py-2">
-          <div className="relative h-6 w-8 shrink-0 overflow-hidden rounded-[4px] border border-white/20 bg-white/20">
-            <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-black/25" />
-            <span className="absolute inset-y-0 left-1/3 w-px bg-black/25" />
-            <span className="absolute inset-y-0 right-1/3 w-px bg-black/25" />
-          </div>
-          <span className="font-mono text-xs tracking-[0.22em] text-white/90">
-            **** {card.lastFour ?? "0000"}
-          </span>
-        </div>
-
-        <div className="flex items-end justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-[9px] font-semibold tracking-[0.13em] text-white/75 uppercase">
-              Balance
-            </p>
-            <p className="mt-1 text-lg font-semibold tracking-[-0.03em] tabular-nums">
+      </div>
+      <div className="px-1 pt-5">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <p className="text-xs text-muted-foreground">Current balance</p>
+            <p className="mt-1 text-2xl font-medium tracking-tight tabular-nums">
               {formatCurrency(card.currentBalance)}
             </p>
           </div>
-          <div className="shrink-0 text-right">
-            <p className="text-[9px] font-semibold tracking-[0.13em] text-white/75 uppercase">
-              Limit
-            </p>
-            <p className="mt-1 text-sm font-medium tabular-nums text-white/90">
-              {wholeCurrency(card.creditLimit)}
-            </p>
-          </div>
+          <p className="pb-1 text-xs text-muted-foreground">
+            Due {formatShortDate(nextOccurrence(card.dueDay))}
+          </p>
         </div>
-
-        <div className="mt-2.5 flex items-center gap-2.5">
-          <UtilizationBar value={util} className="flex-1" trackClassName="bg-black/25" />
-          <span className="w-8 text-right text-[11px] font-semibold tabular-nums text-white/85">
-            {util.toFixed(0)}%
+        <div className="mt-4 flex items-center gap-3">
+          <UtilizationBar
+            value={util}
+            className="flex-1"
+            trackClassName="bg-muted"
+          />
+          <span
+            className={cn(
+              "text-xs tabular-nums",
+              util >= 30 ? "text-destructive" : "text-muted-foreground",
+            )}
+          >
+            {util.toFixed(0)}% used
           </span>
         </div>
-
-        <div className="mt-2.5 flex items-center justify-between gap-3 text-[10px] leading-4 text-white/85">
-          <span>Due {formatShortDate(nextOccurrence(card.dueDay))}</span>
-          {rewards && <span className="truncate text-right">{rewards}</span>}
-        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {formatCurrency(card.creditLimit)} limit
+        </p>
+        {rewards && (
+          <p className="mt-4 border-t border-border pt-3 text-xs leading-5 text-muted-foreground">
+            {rewards}
+          </p>
+        )}
       </div>
     </article>
   );
