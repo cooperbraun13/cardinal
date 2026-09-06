@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PencilIcon, Trash2Icon, PlusIcon, XIcon } from "lucide-react";
+import { PencilIcon, Trash2Icon, PlusIcon } from "lucide-react";
 import { apiFetch } from "@/lib/client";
 import { categoryLabel } from "@/lib/categories";
-import { formatShortDate } from "@/lib/format";
+import { formatCurrency, formatShortDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +23,11 @@ import {
 } from "@/components/ui/dialog";
 
 /** Edit + delete controls for a card. */
-export function CardActions({ card }: { card: CardFormValues & { id: string } }) {
+export function CardActions({
+  card,
+}: {
+  card: CardFormValues & { id: string };
+}) {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -38,7 +42,9 @@ export function CardActions({ card }: { card: CardFormValues & { id: string } })
       router.push("/cards");
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not delete card.");
+      setError(
+        caught instanceof Error ? caught.message : "Could not delete card.",
+      );
     } finally {
       setDeleting(false);
     }
@@ -57,14 +63,16 @@ export function CardActions({ card }: { card: CardFormValues & { id: string } })
       >
         <Trash2Icon className="size-4" /> Delete
       </Button>
-      {editOpen && <CardForm open={editOpen} onOpenChange={setEditOpen} initial={card} />}
+      {editOpen && (
+        <CardForm open={editOpen} onOpenChange={setEditOpen} initial={card} />
+      )}
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete this card?</DialogTitle>
             <DialogDescription>
-              This permanently removes the card along with its transactions, reward rules,
-              benefits, and bonus history.
+              This permanently removes the card along with its transactions,
+              reward rules, benefits, and bonus history.
             </DialogDescription>
           </DialogHeader>
           {error && <ErrorBanner message={error} />}
@@ -72,7 +80,11 @@ export function CardActions({ card }: { card: CardFormValues & { id: string } })
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={deleteCard} disabled={deleting}>
+            <Button
+              variant="destructive"
+              onClick={deleteCard}
+              disabled={deleting}
+            >
               {deleting ? "Deleting…" : "Delete card"}
             </Button>
           </DialogFooter>
@@ -92,7 +104,13 @@ export interface RuleView {
 }
 
 /** Reward rule chips with add/remove. */
-export function RewardRules({ cardId, rules }: { cardId: string; rules: RuleView[] }) {
+export function RewardRules({
+  cardId,
+  rules,
+}: {
+  cardId: string;
+  rules: RuleView[];
+}) {
   const router = useRouter();
   const [addOpen, setAddOpen] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
@@ -105,7 +123,9 @@ export function RewardRules({ cardId, rules }: { cardId: string; rules: RuleView
       await apiFetch(`/api/reward-categories/${id}`, { method: "DELETE" });
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not remove rule.");
+      setError(
+        caught instanceof Error ? caught.message : "Could not remove rule.",
+      );
     } finally {
       setRemovingId(null);
     }
@@ -114,29 +134,71 @@ export function RewardRules({ cardId, rules }: { cardId: string; rules: RuleView
   return (
     <div>
       {error && <ErrorBanner message={error} className="mb-2" />}
-      <div className="flex flex-wrap gap-2">
-        {rules.map((r) => (
-          <Badge key={r.id} variant="secondary" className="gap-1.5 py-1 pr-1 pl-2.5">
-            <span>
-              {r.multiplier}x {categoryLabel(r.category)}
-              {r.endDate ? ` (until ${formatShortDate(r.endDate)})` : ""}
-              {r.spendingCap ? ` · $${r.spendingCap} cap` : ""}
-            </span>
-            <button
-              aria-label={`Remove ${categoryLabel(r.category)} rule`}
-              onClick={() => remove(r.id)}
-              disabled={removingId === r.id}
-              className="rounded-full p-0.5 text-muted-foreground hover:bg-white/10 hover:text-foreground"
+      <div className="divide-y divide-border">
+        {rules.map((rule) => (
+          <div
+            key={rule.id}
+            className="flex items-center justify-between gap-3 py-4 first:pt-0"
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-medium">
+                <span className="mr-3 inline-block min-w-9 text-lg tabular-nums">
+                  {rule.multiplier}x
+                </span>
+                {categoryLabel(rule.category)}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                {rule.startDate && (
+                  <span>From {formatShortDate(rule.startDate)}</span>
+                )}
+                {rule.endDate && (
+                  <Badge variant="outline">
+                    Until {formatShortDate(rule.endDate)}
+                  </Badge>
+                )}
+                {rule.spendingCap !== null && (
+                  <Badge variant="outline">
+                    {formatCurrency(rule.spendingCap)} cap
+                  </Badge>
+                )}
+                {!rule.startDate &&
+                  !rule.endDate &&
+                  rule.spendingCap === null && (
+                    <span>Standard earning rate</span>
+                  )}
+              </div>
+            </div>
+            <Button
+              aria-label={`Remove ${categoryLabel(rule.category)} rule`}
+              onClick={() => remove(rule.id)}
+              disabled={removingId !== null}
+              variant="ghost"
+              size="icon-sm"
+              className="hover:text-destructive"
             >
-              <XIcon className="size-3" />
-            </button>
-          </Badge>
+              <Trash2Icon className="size-4" />
+            </Button>
+          </div>
         ))}
-        <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
-          <PlusIcon className="size-3.5" /> Rule
-        </Button>
       </div>
-      <RewardRuleForm open={addOpen} onOpenChange={setAddOpen} cardId={cardId} />
+      {rules.length === 0 && (
+        <p className="mb-design-sm text-sm leading-6 text-muted-foreground">
+          No reward rules yet. Add the categories this card earns on.
+        </p>
+      )}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setAddOpen(true)}
+        className="mt-3"
+      >
+        <PlusIcon className="size-4" /> Add reward rule
+      </Button>
+      <RewardRuleForm
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        cardId={cardId}
+      />
     </div>
   );
 }
@@ -146,7 +208,7 @@ export function AddBenefitButton({ cardId }: { cardId: string }) {
   return (
     <>
       <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
-        <PlusIcon className="size-3.5" /> Benefit
+        <PlusIcon className="size-3.5" /> Add benefit
       </Button>
       <BenefitForm open={open} onOpenChange={setOpen} cardId={cardId} />
     </>
@@ -158,16 +220,32 @@ export function SetBonusButton({
   initial,
 }: {
   cardId: string;
-  initial?: { spendRequirement: number; rewardAmount: number; rewardType: string; deadline: string };
+  initial?: {
+    spendRequirement: number;
+    rewardAmount: number;
+    rewardType: string;
+    deadline: string;
+  };
 }) {
   const [open, setOpen] = useState(false);
   return (
     <>
       <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
-        {initial ? <PencilIcon className="size-3.5" /> : <PlusIcon className="size-3.5" />}
-        {initial ? "Edit bonus" : "Bonus"}
+        {initial ? (
+          <PencilIcon className="size-3.5" />
+        ) : (
+          <PlusIcon className="size-3.5" />
+        )}
+        {initial ? "Edit bonus" : "Add bonus"}
       </Button>
-      {open && <BonusForm open={open} onOpenChange={setOpen} cardId={cardId} initial={initial} />}
+      {open && (
+        <BonusForm
+          open={open}
+          onOpenChange={setOpen}
+          cardId={cardId}
+          initial={initial}
+        />
+      )}
     </>
   );
 }

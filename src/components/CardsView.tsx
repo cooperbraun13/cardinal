@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import { CreditCardTile, type CreditCardTileData } from "@/components/CreditCardTile";
+import type { CreditCardTileData } from "@/components/CreditCardTile";
+import { CardGrid } from "@/components/CardGrid";
+import { Button } from "@/components/ui/button";
+import { Field } from "@/components/forms/Field";
 import { NativeSelect } from "@/components/ui/native-select";
 import { EmptyState } from "@/components/EmptyState";
 import { AddCardButton } from "@/components/AddButtons";
@@ -23,17 +25,27 @@ export function CardsView({ cards }: { cards: CardListItem[] }) {
   const [rewardType, setRewardType] = useState("all");
   const [sort, setSort] = useState<SortKey>("utilization");
 
-  const issuers = useMemo(() => [...new Set(cards.map((c) => c.issuer))].sort(), [cards]);
+  const issuers = useMemo(
+    () => [...new Set(cards.map((c) => c.issuer))].sort(),
+    [cards],
+  );
   const rewardCategories = useMemo(
-    () => [...new Set(cards.flatMap((c) => c.rewardCategories.map((r) => r.category)))].sort(),
-    [cards]
+    () =>
+      [
+        ...new Set(
+          cards.flatMap((c) => c.rewardCategories.map((r) => r.category)),
+        ),
+      ].sort(),
+    [cards],
   );
 
   const visible = useMemo(() => {
     let list = cards;
     if (issuer !== "all") list = list.filter((c) => c.issuer === issuer);
     if (rewardType !== "all")
-      list = list.filter((c) => c.rewardCategories.some((r) => r.category === rewardType));
+      list = list.filter((c) =>
+        c.rewardCategories.some((r) => r.category === rewardType),
+      );
     const now = new Date();
     return [...list].sort((a, b) => {
       switch (sort) {
@@ -43,7 +55,10 @@ export function CardsView({ cards }: { cards: CardListItem[] }) {
             utilization(a.currentBalance, a.creditLimit)
           );
         case "dueDate":
-          return nextOccurrence(a.dueDay, now).getTime() - nextOccurrence(b.dueDay, now).getTime();
+          return (
+            nextOccurrence(a.dueDay, now).getTime() -
+            nextOccurrence(b.dueDay, now).getTime()
+          );
         case "annualFee":
           return b.annualFee - a.annualFee;
         case "balance":
@@ -65,63 +80,73 @@ export function CardsView({ cards }: { cards: CardListItem[] }) {
   }
 
   return (
-    <div className="space-y-5">
-      <div className="panel grid gap-2 p-3 sm:grid-cols-3">
-        <NativeSelect
-          value={issuer}
-          onChange={(e) => setIssuer(e.target.value)}
-          aria-label="Filter by issuer"
-          wrapperClassName="w-full"
-        >
-          <option value="all">All issuers</option>
-          {issuers.map((i) => (
-            <option key={i} value={i}>
-              {i}
-            </option>
-          ))}
-        </NativeSelect>
-        <NativeSelect
-          value={rewardType}
-          onChange={(e) => setRewardType(e.target.value)}
-          aria-label="Filter by reward category"
-          wrapperClassName="w-full"
-        >
-          <option value="all">All reward types</option>
-          {rewardCategories.map((c) => (
-            <option key={c} value={c}>
-              {categoryLabel(c)}
-            </option>
-          ))}
-        </NativeSelect>
-        <NativeSelect
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortKey)}
-          aria-label="Sort cards"
-          wrapperClassName="w-full"
-        >
-          <option value="utilization">Sort: Utilization</option>
-          <option value="dueDate">Sort: Due date</option>
-          <option value="annualFee">Sort: Annual fee</option>
-          <option value="balance">Sort: Balance</option>
-        </NativeSelect>
+    <div className="space-y-8">
+      <div className="grid gap-4 border-y border-border py-5 sm:grid-cols-3">
+        <Field label="Issuer">
+          <NativeSelect
+            value={issuer}
+            onChange={(e) => setIssuer(e.target.value)}
+            aria-label="Filter by issuer"
+            wrapperClassName="w-full"
+          >
+            <option value="all">All issuers</option>
+            {issuers.map((i) => (
+              <option key={i} value={i}>
+                {i}
+              </option>
+            ))}
+          </NativeSelect>
+        </Field>
+        <Field label="Reward category">
+          <NativeSelect
+            value={rewardType}
+            onChange={(e) => setRewardType(e.target.value)}
+            aria-label="Filter by reward category"
+            wrapperClassName="w-full"
+          >
+            <option value="all">All categories</option>
+            {rewardCategories.map((c) => (
+              <option key={c} value={c}>
+                {categoryLabel(c)}
+              </option>
+            ))}
+          </NativeSelect>
+        </Field>
+        <Field label="Sort by">
+          <NativeSelect
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            aria-label="Sort cards"
+            wrapperClassName="w-full"
+          >
+            <option value="utilization">Sort: Utilization</option>
+            <option value="dueDate">Sort: Due date</option>
+            <option value="annualFee">Sort: Annual fee</option>
+            <option value="balance">Sort: Balance</option>
+          </NativeSelect>
+        </Field>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {visible.map((card) => (
-          <Link
-            key={card.id}
-            href={`/cards/${card.id}`}
-            aria-label={`View ${card.name}`}
-            className="group rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-          >
-            <CreditCardTile card={card} />
-          </Link>
-        ))}
-      </div>
+      <p className="text-xs text-muted-foreground" aria-live="polite">
+        {visible.length} of {cards.length} cards
+      </p>
+      <CardGrid cards={visible} maxCards={visible.length} />
       {visible.length === 0 && (
-        <p aria-live="polite" className="py-10 text-center text-sm text-muted-foreground">
-          No cards match these filters.
-        </p>
+        <EmptyState
+          title="No matching cards"
+          description="Try another issuer or reward category."
+          action={
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIssuer("all");
+                setRewardType("all");
+              }}
+            >
+              Clear filters
+            </Button>
+          }
+        />
       )}
     </div>
   );

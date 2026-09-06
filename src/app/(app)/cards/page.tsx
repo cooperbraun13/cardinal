@@ -18,11 +18,11 @@ export default async function CardsPage() {
   });
 
   return (
-    <div className="page-stack">
+    <div className="page-shell page-stack">
       <PageHeader
-        eyebrow="Cards"
-        title="Your cards"
-        description={`${cards.length} active ${cards.length === 1 ? "card" : "cards"}. Review balances, limits, payment dates, and reward categories.`}
+        eyebrow="Your wallet"
+        title="A home for every card."
+        description="Keep your balances in sight and your next payment in mind."
         actions={<AddCardButton />}
       />
       <CardsView cards={cards} />
