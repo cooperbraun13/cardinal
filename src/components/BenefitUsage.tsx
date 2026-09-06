@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/client";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ export function BenefitUsage({
   totalValue: number;
 }) {
   const router = useRouter();
+  const amountId = useId();
   const [amount, setAmount] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -44,8 +45,11 @@ export function BenefitUsage({
   }
 
   return (
-    <div className="mt-5 border-t border-border pt-4">
+    <div className="mt-design-sm border-t border-border pt-4">
       {error && <ErrorBanner message={error} className="mb-2" />}
+      <label htmlFor={amountId} className="mb-2 block text-xs font-medium">
+        Record benefit usage
+      </label>
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -54,6 +58,9 @@ export function BenefitUsage({
         className="flex flex-wrap gap-2"
       >
         <Input
+          id={amountId}
+          required
+          disabled={pending}
           type="number"
           min="0.01"
           step="0.01"
@@ -62,8 +69,8 @@ export function BenefitUsage({
           onChange={(e) => setAmount(e.target.value)}
           className="min-w-32 flex-1 text-xs"
         />
-        <Button type="submit" size="sm" disabled={pending}>
-          Log use
+        <Button type="submit" variant="outline" size="sm" disabled={pending}>
+          {pending ? "Saving..." : "Log use"}
         </Button>
         {usedValue > 0 && (
           <Button
