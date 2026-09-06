@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { ApiError } from "@/lib/api";
 import { getOwnedCard } from "@/lib/ownership";
 import { syncCardRewards } from "@/services/transactions";
+import { dayStart } from "@/lib/dates";
 import type { rewardCategorySchema } from "@/lib/validation";
 import type { z } from "zod";
 
@@ -19,7 +20,7 @@ export async function createRewardRule(userId: string, cardId: string, input: Re
       endDate: input.endDate ? new Date(input.endDate) : null,
     } });
     const card = await getOwnedCard(userId, cardId, db);
-    await syncCardRewards(db, card, rule.startDate ?? new Date(0));
+    await syncCardRewards(db, card, rule.startDate ? dayStart(rule.startDate) : new Date(0));
     return rule;
   });
 }
@@ -31,6 +32,6 @@ export async function deleteRewardRule(userId: string, id: string) {
     if (!rule) throw new ApiError(404, "RULE_NOT_FOUND", "Reward rule could not be found.");
     await db.rewardCategory.delete({ where: { id } });
     const card = await getOwnedCard(userId, rule.cardId, db);
-    await syncCardRewards(db, card, rule.startDate ?? new Date(0));
+    await syncCardRewards(db, card, rule.startDate ? dayStart(rule.startDate) : new Date(0));
   });
 }

@@ -122,7 +122,7 @@ describe("transaction persistence", () => {
     const reward = () => db.reward.findFirstOrThrow({ where: { transactionId: transaction.id } });
     expect((await reward()).rewardAmount).toBe(100);
     const rule = await createRewardRule(userId, cardId, {
-      category: "dining", multiplier: 5, startDate: null, endDate: null,
+      category: "dining", multiplier: 5, startDate: "2026-08-15T12:00:00Z", endDate: null,
       spendingCap: null, notes: null,
     });
     expect((await reward()).rewardAmount).toBe(500);
