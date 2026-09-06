@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { LoaderCircleIcon } from "lucide-react";
+import { Select } from "@base-ui/react/select";
+import { CheckIcon, ChevronDownIcon, LoaderCircleIcon } from "lucide-react";
 import { apiFetch } from "@/lib/client";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { Field } from "@/components/forms/Field";
 import { Button } from "@/components/ui/button";
-import { NativeSelect } from "@/components/ui/native-select";
 import {
   ANNUAL_INCOME_RANGES,
   DEBT_STATUSES,
@@ -42,17 +42,54 @@ function ProfileSelect({
 }) {
   return (
     <Field label={label} hint={description}>
-      <NativeSelect
-        value={value ?? ""}
-        onChange={(event) => onChange(field, event.target.value || null)}
+      <Select.Root<string>
+        value={value}
+        onValueChange={(nextValue) => onChange(field, nextValue)}
       >
-        <option value="">Prefer not to say yet</option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {PROFILE_OPTION_LABELS[option]}
-          </option>
-        ))}
-      </NativeSelect>
+        <Select.Trigger className="flex h-12 w-full items-center justify-between gap-3 rounded-sm border border-input bg-background px-3 text-left text-base transition-[background-color,border-color] duration-200 ease-out hover:border-foreground focus-visible:border-ring focus-visible:bg-background/65 focus-visible:ring-2 focus-visible:ring-ring data-open:border-foreground data-open:bg-background/65 md:text-sm">
+          <Select.Value
+            className="truncate data-placeholder:text-muted-foreground"
+            placeholder="Prefer not to say yet"
+          />
+          <Select.Icon className="text-muted-foreground transition-transform duration-200 ease-out data-open:rotate-180">
+            <ChevronDownIcon className="size-4" />
+          </Select.Icon>
+        </Select.Trigger>
+        <Select.Portal>
+          <Select.Positioner
+            sideOffset={6}
+            className="z-50 w-(--anchor-width) outline-none"
+          >
+            <Select.Popup className="max-h-(--available-height) origin-(--transform-origin) overflow-hidden border border-border bg-popover text-popover-foreground shadow-lg transition-[opacity,transform] duration-200 ease-out data-ending-style:translate-y-1 data-ending-style:opacity-0 data-starting-style:-translate-y-1 data-starting-style:opacity-0">
+              <Select.List className="max-h-(--available-height) overflow-y-auto p-1">
+                <Select.Item
+                  value={null}
+                  className="relative flex min-h-11 cursor-default items-center rounded-sm py-2 pr-9 pl-3 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-foreground"
+                >
+                  <Select.ItemText>Prefer not to say yet</Select.ItemText>
+                  <Select.ItemIndicator className="absolute right-3 text-foreground">
+                    <CheckIcon className="size-4" />
+                  </Select.ItemIndicator>
+                </Select.Item>
+                {options.map((option) => (
+                  <Select.Item
+                    key={option}
+                    value={option}
+                    className="relative flex min-h-11 cursor-default items-center rounded-sm py-2 pr-9 pl-3 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-foreground"
+                  >
+                    <Select.ItemText>
+                      {PROFILE_OPTION_LABELS[option]}
+                    </Select.ItemText>
+                    <Select.ItemIndicator className="absolute right-3 text-foreground">
+                      <CheckIcon className="size-4" />
+                    </Select.ItemIndicator>
+                  </Select.Item>
+                ))}
+              </Select.List>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Portal>
+      </Select.Root>
     </Field>
   );
 }
