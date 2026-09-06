@@ -14,6 +14,7 @@ vi.mock("next/headers", () => ({ cookies: async () => ({
 import { createTransactionWithEffects, updateTransactionWithEffects, deleteTransactionWithEffects } from "@/services/transactions";
 import { updateBenefit } from "@/services/benefit-updates";
 import { createRewardRule, deleteRewardRule } from "@/services/reward-rules";
+import { upsertSignupBonus } from "@/services/signup-bonuses";
 import { createSession, getCurrentUser, destroySession } from "@/lib/auth";
 import { getCandidateCards, getDashboardData } from "@/services/data";
 import * as transactionRoutes from "@/app/api/transactions/route";
@@ -207,5 +208,27 @@ describe("benefit updates and aggregates", () => {
     const dashboard = await getDashboardData(userId);
     expect(dashboard.totals.spendThisMonth).toBe(10);
     expect(dashboard.totals.rewardsValueThisMonth).toBe(0.5);
+  });
+});
+
+describe("signup bonus persistence", () => {
+  const bonus = { spendRequirement: 1000, rewardAmount: 100, rewardType: "points" as const,
+    deadline: "2026-12-01" };
+
+  it("preserves completion when an edit omits that field", async () => {
+    const first = await upsertSignupBonus(userId, cardId, { ...bonus, completed: true });
+    expect(first.created).toBe(true);
+    const second = await upsertSignupBonus(userId, cardId, { ...bonus, rewardAmount: 200 });
+    expect(second.created).toBe(false);
+    expect(second.bonus.completed).toBe(true);
+  });
+
+  it("does not persist duplicate bonuses under concurrent upserts", async () => {
+    const results = await Promise.allSettled([
+      upsertSignupBonus(userId, cardId, bonus),
+      upsertSignupBonus(userId, cardId, { ...bonus, rewardAmount: 200 }),
+    ]);
+    expect(results.some((result) => result.status === "fulfilled")).toBe(true);
+    expect(await db.signupBonus.count({ where: { cardId } })).toBe(1);
   });
 });

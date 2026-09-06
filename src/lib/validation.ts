@@ -107,7 +107,7 @@ export const signupBonusSchema = z.object({
   rewardAmount: z.coerce.number().positive("Reward amount must be positive"),
   rewardType: z.enum(REWARD_TYPES),
   deadline: dateString,
-  completed: z.boolean().default(false),
+  completed: z.boolean().optional(),
 });
 
 const transactionFields = z.object({

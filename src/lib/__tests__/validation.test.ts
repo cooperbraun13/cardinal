@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { benefitSchema, benefitUpdateSchema, cardSchema, cardUpdateSchema, rewardCategorySchema, transactionSchema, transactionUpdateSchema } from "@/lib/validation";
+import { benefitSchema, benefitUpdateSchema, cardSchema, cardUpdateSchema, rewardCategorySchema, signupBonusSchema, transactionSchema, transactionUpdateSchema } from "@/lib/validation";
 
 describe("partial updates", () => {
   it("does not populate card creation defaults", () => {
@@ -10,6 +10,10 @@ describe("partial updates", () => {
   });
   it("does not reset benefit usage or activation", () => {
     expect(benefitUpdateSchema.parse({ name: "Renamed" })).toEqual({ name: "Renamed" });
+  });
+  it("does not mark an edited signup bonus incomplete implicitly", () => {
+    expect(signupBonusSchema.parse({ spendRequirement: 1000, rewardAmount: 100,
+      rewardType: "points", deadline: "2026-12-01" }).completed).toBeUndefined();
   });
   it("distinguishes an omitted date from a cleared date", () => {
     expect(cardUpdateSchema.parse({ openedAt: null })).toEqual({ openedAt: null });
