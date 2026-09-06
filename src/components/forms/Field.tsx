@@ -16,14 +16,20 @@ export function Field({
   htmlFor?: string;
 }) {
   const generatedId = useId();
-  const controlId = htmlFor ?? generatedId;
+  const childId = isValidElement<{ id?: string }>(children)
+    ? children.props.id
+    : undefined;
+  const controlId = htmlFor ?? childId ?? generatedId;
   const control = isValidElement<{ id?: string }>(children)
-    ? cloneElement(children, { id: children.props.id ?? controlId })
+    ? cloneElement(children, { id: controlId })
     : children;
 
   return (
     <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
-      <Label htmlFor={controlId} className="text-xs font-medium text-muted-foreground">
+      <Label
+        htmlFor={controlId}
+        className="text-xs font-medium text-foreground/85"
+      >
         {label}
       </Label>
       {control}
