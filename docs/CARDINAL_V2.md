@@ -178,9 +178,10 @@ Calculators are separate from lessons and plan rules. A calculator has a small i
 
 ```text
 CalculatorDefinition
-  id, slug, title, description, inputSchema,
-  calculate(input) → result,
+  id, slug, title, description, inputFields,
   assumptions, relatedLessonSlugs, version
+
+The current registry lives in `src/features/calculators/registry.ts`. Pure calculation functions remain separate from this metadata so UI forms can be added without moving financial logic.
 ```
 
 Use integer minor units or a decimal-safe library/representation for new money calculations, explicit annual/monthly rate conversions, and clear rounding at presentation boundaries. The compound-growth calculator rounds its monetary result fields to cents at the output boundary. Each calculator must state what it does not model. Initial calculators can be added independently: compound growth, emergency fund, credit-card interest, employer match, mortgage payment, rent vs. buy, and Roth vs. Traditional comparison.
@@ -205,7 +206,7 @@ Use integer minor units or a decimal-safe library/representation for new money c
 
 - Add calculator definitions and independently tested formulas. Compound-growth, emergency-fund, credit-card-interest, employer-match, mortgage-payment, and Roth-versus-Traditional comparisons are now available as pure feature modules; UI calculators and the remaining formulas are future work. The credit-card estimate assumes a constant balance, a 365-day year, and simple daily interest; issuer methods can differ. The employer-match estimate assumes one salary percentage cap and does not model plan-specific limits or vesting. Mortgage results cover principal and interest only; taxes, insurance, mortgage insurance, fees, and escrow are excluded. The Roth comparison is a simplified tax-rate illustration with no growth, deductions, contribution limits, or account-specific rules.
 - Mortgage terms are converted to whole monthly payments by rounding years × 12, matching the compound-growth calculator's term conversion.
-- Publish reviewed investing education in small, linked learning paths. Employer-match, investing-basics, Roth IRA, Traditional IRA, 401(k), HSA, brokerage account, and ETF lessons are available; further account and investment-topic coverage remains future work.
+- Publish reviewed investing education in small, linked learning paths. The current catalog includes credit, savings, retirement accounts, investing products, diversification, credit scores, mortgages, deductibles, insurance, and taxes; guided learning paths and progress remain future work.
 - Connect calculator results to relevant lessons without treating outputs as advice.
 
 ### Phase 4 — broader money domains
