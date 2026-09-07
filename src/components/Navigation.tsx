@@ -21,26 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-
-const LINKS = [
-  { href: "/home", label: "Home", activePaths: ["/home"] },
-  {
-    href: "/money",
-    label: "Money",
-    activePaths: [
-      "/money",
-      "/dashboard",
-      "/cards",
-      "/transactions",
-      "/benefits",
-      "/optimizer",
-    ],
-  },
-  { href: "/invest", label: "Invest", activePaths: ["/invest"] },
-  { href: "/learn", label: "Learn", activePaths: ["/learn"] },
-  { href: "/plan", label: "Plan", activePaths: ["/plan"] },
-  { href: "/profile", label: "Profile", activePaths: ["/profile"] },
-];
+import { PRIMARY_LINKS, getActiveSection } from "@/lib/navigation";
 
 export function Navigation({ userName }: { userName: string }) {
   const pathname = usePathname();
@@ -63,10 +44,8 @@ export function Navigation({ userName }: { userName: string }) {
   }
 
   function links(mobile = false) {
-    return LINKS.map(({ href, label, activePaths }) => {
-      const active = activePaths.some(
-        (path) => pathname === path || pathname.startsWith(`${path}/`),
-      );
+    return PRIMARY_LINKS.map(({ href, label }) => {
+      const active = getActiveSection(pathname)?.href === href;
       return (
         <Link
           key={href}
