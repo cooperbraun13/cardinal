@@ -259,7 +259,7 @@ export const lessons: Lesson[] = [
         description: "Continue with Cardinal's investing education entry point.",
       },
     ],
-    relatedSlugs: ["employer-match", "roth-ira"],
+    relatedSlugs: ["employer-match", "roth-ira", "traditional-ira"],
   },
   {
     slug: "roth-ira",
@@ -319,7 +319,67 @@ export const lessons: Lesson[] = [
         description: "Continue with Cardinal's introductory investing education.",
       },
     ],
-    relatedSlugs: ["investing-basics", "employer-match"],
+    relatedSlugs: ["investing-basics", "employer-match", "traditional-ira"],
+  },
+  {
+    slug: "traditional-ira",
+    title: "Traditional IRAs",
+    summary: "Learn the basic tax and withdrawal questions behind a Traditional IRA.",
+    topic: "Investing",
+    estimatedMinutes: 6,
+    sections: [
+      {
+        key: "whatItIs",
+        title: "What it is",
+        body: [
+          "A Traditional IRA is an individual retirement account. Depending on a person's circumstances, contributions may be fully, partly, or not deductible, and amounts in the account are generally not taxed until they are distributed.",
+          "The account is a container for investments. Its tax rules are separate from the investments, fees, and risk of what is held inside it.",
+        ],
+      },
+      {
+        key: "whyItMatters",
+        title: "Why it matters",
+        body: [
+          "A Traditional IRA is one of several retirement account types people may compare. Understanding the timing of possible deductions and taxes can help you prepare questions before choosing how to save for retirement.",
+        ],
+      },
+      {
+        key: "whoItIsFor",
+        title: "Who it is for",
+        body: [
+          "This lesson is for people learning about retirement accounts, including people who have a workplace retirement plan. Contribution eligibility, limits, and whether a contribution is deductible can depend on taxable compensation, income, filing status, and workplace-plan coverage.",
+        ],
+      },
+      {
+        key: "howItWorks",
+        title: "How it works",
+        body: [
+          "A person opens a Traditional IRA with an eligible provider and contributes within the rules that apply to them. Provider materials and current IRS guidance can help confirm contribution and deduction rules for a particular tax year.",
+          "When a distribution is taken, its tax treatment can depend on the account's history, including whether any nondeductible contributions were made. Keeping records matters when an account has after-tax contributions or certain rollovers.",
+        ],
+      },
+      {
+        key: "importantConsiderations",
+        title: "Important considerations",
+        body: [
+          "Traditional IRA and Roth IRA rules differ, and contributions to both types can share an annual limit. Early withdrawals, rollovers, conversions, and required distributions can have additional rules and tax consequences.",
+          "This lesson is educational and does not determine a deduction, recommend an account, or provide tax advice. Check current official guidance and consider qualified help for a decision specific to you.",
+        ],
+      },
+    ],
+    nextSteps: [
+      {
+        label: "Compare Roth IRA basics",
+        href: "/learn/roth-ira",
+        description: "Learn how Roth IRA rules differ at a high level.",
+      },
+      {
+        label: "Learn investing basics",
+        href: "/learn/investing-basics",
+        description: "See how an account differs from the investments it holds.",
+      },
+    ],
+    relatedSlugs: ["roth-ira", "investing-basics", "employer-match"],
   },
 ];
 
