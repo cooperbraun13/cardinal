@@ -37,7 +37,7 @@ The v2 shell adds these primary section routes:
 /invest            investing education entry point
 /learn             lesson library
 /learn/[slug]      data-driven lesson page
-/plan              future prioritized next steps
+/plan              prioritized, profile-backed educational next steps
 /profile           optional financial profile
 ```
 
@@ -82,8 +82,8 @@ src/
   features/
     learn/                          lessons, lesson rendering, content sources
     credit/                         future home for migrated credit feature code
-    plan/                           plan rules, explanations, persistence when implemented
-    profile/                        onboarding and profile schemas/services when implemented
+    plan/                           initial deterministic rules and explanations; later persistence
+    profile/                        optional profile schema, service, API, and form
     investing/                      investing education and later domain workflows
     calculators/                    calculator definitions and pure calculation functions
   services/                         existing v1 financial services; migrate only with a feature change
@@ -119,7 +119,7 @@ Each lesson uses a stable slug and supports:
 
 Lesson prose should distinguish education from personalized recommendations. It should state assumptions, avoid guarantees, explain terms before using them, and link to a next action only when Cardinal can support it. A lesson is not a calculator and does not embed financial-profile rules.
 
-Initial lesson topics, added in small reviewed sets, are: Roth IRA, Traditional IRA, 401(k), HSA, brokerage accounts, ETFs, index funds, stocks, bonds, diversification, emergency funds, credit scores, APR, credit utilization, mortgages, deductibles, insurance, and taxes.
+The five currently published lessons cover APR, credit utilization, emergency funds, employer 401(k) matches, and investing basics. Future reviewed sets may add Roth IRA, Traditional IRA, 401(k), HSA, brokerage accounts, ETFs, index funds, stocks, bonds, diversification, credit scores, mortgages, deductibles, insurance, and taxes.
 
 ## Financial profile direction
 
@@ -158,7 +158,7 @@ FinancialProfile + (later, relevant owned credit summary)
   → plan page with explanation, lesson, and action link
 ```
 
-The current recommendation contract contains a stable rule ID, priority, title, action, rationale, `whySuggested`, an internal destination, `inputsUsed`, and assumptions. As education coverage expands, it should add a lesson slug to each applicable rule. A future persisted-plan record should contain:
+The current recommendation contract contains a stable rule ID, priority, title, action, rationale, `whySuggested`, an internal destination, `inputsUsed`, and assumptions. Current educational rules link directly to their matching published lesson. A future persisted-plan record should add a structured lesson slug and contain:
 
 ```text
 id, ruleId, ruleVersion, priority, status,
@@ -194,7 +194,7 @@ Use integer minor units or a decimal-safe library/representation for new money c
 - Introduce a data-driven Learn contract, catalog, and lesson renderer.
 - Document module boundaries, profile direction, Plan design, calculators, and delivery phases.
 
-### Phase 2 — profile and Cardinal Plan (in progress)
+### Phase 2 — profile and Cardinal Plan (first slice complete)
 
 - Implement privacy-focused profile onboarding with the minimum fields (complete).
 - Build validated profile APIs/services and ownership coverage (complete).
@@ -204,7 +204,7 @@ Use integer minor units or a decimal-safe library/representation for new money c
 ### Phase 3 — calculators and investing education
 
 - Add calculator definitions and independently tested formulas.
-- Publish reviewed investing education in small, linked learning paths.
+- Publish reviewed investing education in small, linked learning paths. The initial employer-match and investing-basics lessons are available; account and investment-topic coverage remains future work.
 - Connect calculator results to relevant lessons without treating outputs as advice.
 
 ### Phase 4 — broader money domains

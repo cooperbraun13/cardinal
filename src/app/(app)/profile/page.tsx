@@ -13,7 +13,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="page-shell page-stack">
-      <PageHeader eyebrow="Profile" title="Your context, on your terms." description="Cardinal will only ask for information that makes a future plan more useful." />
+      <PageHeader eyebrow="Profile" title="Your context, on your terms." description="Cardinal only asks for information that makes your Plan more useful." />
       <section className="panel panel-body max-w-2xl" aria-labelledby="account-heading">
         <UserRoundIcon className="size-5 text-muted-foreground" aria-hidden="true" />
         <p className="eyebrow mt-design-md">Account</p>

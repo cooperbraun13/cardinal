@@ -67,8 +67,8 @@ export function buildCardinalPlan(context: PlanContext): PlanRecommendation[] {
         "A cash buffer can make an unexpected expense easier to handle without relying as heavily on new debt.",
       whySuggested:
         "You shared that you have not started emergency savings yet.",
-      href: "/learn",
-      linkLabel: "Explore lessons",
+      href: "/learn/emergency-fund",
+      linkLabel: "Read emergency-fund lesson",
       inputsUsed: ["emergencyFundStatus"],
       assumptions: ["Cardinal has not calculated a savings target for you."],
     });
@@ -88,8 +88,8 @@ export function buildCardinalPlan(context: PlanContext): PlanRecommendation[] {
         "Employer retirement plans can have contribution-match rules that are useful to understand as you consider longer-term goals.",
       whySuggested:
         "You shared that a workplace retirement plan and employer match are available.",
-      href: "/invest",
-      linkLabel: "Explore Invest",
+      href: "/learn/employer-match",
+      linkLabel: "Read employer-match lesson",
       inputsUsed: ["employer401kStatus", "employerMatchStatus"],
       assumptions: ["Plan terms and eligibility can vary; Cardinal does not have your plan documents."],
     });
@@ -106,8 +106,8 @@ export function buildCardinalPlan(context: PlanContext): PlanRecommendation[] {
         "A starter fund is a beginning. Understanding likely expenses can help you decide what additional cushion would feel useful.",
       whySuggested:
         "You shared that you have some emergency savings set aside.",
-      href: "/learn",
-      linkLabel: "Explore lessons",
+      href: "/learn/emergency-fund",
+      linkLabel: "Read emergency-fund lesson",
       inputsUsed: ["emergencyFundStatus"],
       assumptions: ["Cardinal has not calculated a savings target for you."],
     });
@@ -123,8 +123,8 @@ export function buildCardinalPlan(context: PlanContext): PlanRecommendation[] {
       rationale:
         "A shared vocabulary can make retirement accounts, funds, and investment choices easier to understand.",
       whySuggested: "You shared that you are new to investing.",
-      href: "/invest",
-      linkLabel: "Explore Invest",
+      href: "/learn/investing-basics",
+      linkLabel: "Read investing-basics lesson",
       inputsUsed: ["investingExperience"],
       assumptions: ["This is education, not a recommendation to buy or sell an investment."],
     });

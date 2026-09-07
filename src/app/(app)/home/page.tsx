@@ -40,7 +40,7 @@ export default async function HomePage() {
         <p className="eyebrow">What comes next</p>
         <h2 id="next-heading" className="mt-design-xxs section-title">A plan built around your context.</h2>
         <p className="mt-design-xs max-w-xl text-sm leading-6 text-muted-foreground">
-          Cardinal Plan will eventually turn the information you choose to share into clear, explainable next steps. Until then, you can start with your existing credit picture or a focused lesson.
+          Cardinal Plan turns the information you choose to share into clear, explainable next steps. Start with your existing credit picture, a focused lesson, or your Plan.
         </p>
       </section>
     </div>

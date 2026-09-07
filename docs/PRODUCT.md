@@ -34,7 +34,7 @@ The current version is a manual-entry credit-card product. Its core journey is: 
 
 ## Future direction
 
-Cardinal now has a v2 foundation: Home, Money, Invest, Learn, Plan, and Profile provide a stable product structure; Money exposes the existing credit-card experience, and Learn has its first data-driven lessons. Broader financial workflows, profile collection, Plan recommendations, calculators, and account connections are not implemented yet. The architecture, safeguards, and phased roadmap are in [Cardinal v2 foundation](CARDINAL_V2.md).
+Cardinal now has a v2 foundation: Home, Money, Invest, Learn, Plan, and Profile provide a stable product structure; Money exposes the existing credit-card experience; Learn includes introductory credit, savings, and investing lessons; and Profile can provide optional context to the first transparent Cardinal Plan rules. Broader financial workflows, calculators, connected accounts, and richer profile and Plan capabilities remain future work. The architecture, safeguards, and phased roadmap are in [Cardinal v2 foundation](CARDINAL_V2.md).
 
 ## Scope guardrails
 

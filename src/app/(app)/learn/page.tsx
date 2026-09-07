@@ -13,7 +13,7 @@ export default function LearnPage() {
       <section aria-labelledby="lessons-heading">
         <div className="flex items-center gap-design-xs">
           <BookOpenIcon className="size-5 text-muted-foreground" aria-hidden="true" />
-          <h2 id="lessons-heading" className="section-title">Start with credit basics</h2>
+          <h2 id="lessons-heading" className="section-title">Start with the basics</h2>
         </div>
         <div className="mt-design-sm grid gap-design-sm md:grid-cols-2">
           {lessons.map((lesson) => (

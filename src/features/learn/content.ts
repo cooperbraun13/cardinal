@@ -105,6 +105,162 @@ export const lessons: Lesson[] = [
     ],
     relatedSlugs: ["credit-utilization"],
   },
+  {
+    slug: "emergency-fund",
+    title: "Emergency funds",
+    summary: "Understand how a cash cushion can help with unexpected expenses.",
+    topic: "Savings",
+    estimatedMinutes: 5,
+    sections: [
+      {
+        key: "whatItIs",
+        title: "What it is",
+        body: [
+          "An emergency fund is money set aside for an unplanned expense or loss of income. It is usually kept somewhere accessible, so it is available when it is needed.",
+        ],
+      },
+      {
+        key: "whyItMatters",
+        title: "Why it matters",
+        body: [
+          "A cash cushion can give you more options when a repair, medical bill, or income interruption happens. It may reduce the need to put a surprise expense on a high-interest credit card.",
+        ],
+      },
+      {
+        key: "whoItIsFor",
+        title: "Who it is for",
+        body: [
+          "This idea can be useful for anyone whose expenses or income could change unexpectedly. The amount that feels useful depends on a person's household, obligations, income stability, and other resources.",
+        ],
+      },
+      {
+        key: "howItWorks",
+        title: "How it works",
+        body: [
+          "People often begin with a small, separate cash goal and add to it over time. Before choosing a target, it can help to list the expenses you would need to cover and decide what access to the money you need.",
+        ],
+      },
+      {
+        key: "importantConsiderations",
+        title: "Important considerations",
+        body: [
+          "Emergency savings are different from money earmarked for a planned purchase or long-term investment. A target that works for someone else may not fit your situation, and Cardinal does not calculate a target in this lesson.",
+        ],
+      },
+    ],
+    nextSteps: [
+      {
+        label: "Review your Plan",
+        href: "/plan",
+        description: "See how your saved emergency-savings status affects your next steps.",
+      },
+    ],
+    relatedSlugs: ["apr", "credit-utilization"],
+  },
+  {
+    slug: "employer-match",
+    title: "Employer retirement matches",
+    summary: "Learn the questions to ask about a workplace retirement contribution match.",
+    topic: "Investing",
+    estimatedMinutes: 5,
+    sections: [
+      {
+        key: "whatItIs",
+        title: "What it is",
+        body: [
+          "Some workplace retirement plans include an employer contribution that depends on an employee's contribution. The details are set by the employer's plan, not by a universal rule.",
+        ],
+      },
+      {
+        key: "whyItMatters",
+        title: "Why it matters",
+        body: [
+          "A match can be an important part of understanding a workplace retirement benefit. Reading the terms helps you see what contribution, timing, and eligibility rules apply to your specific plan.",
+        ],
+      },
+      {
+        key: "whoItIsFor",
+        title: "Who it is for",
+        body: [
+          "This lesson is for people who have access to a workplace retirement plan, such as a 401(k), 403(b), or similar plan. It is also useful if you are not sure whether a match is offered.",
+        ],
+      },
+      {
+        key: "howItWorks",
+        title: "How it works",
+        body: [
+          "Plan materials usually describe the contribution formula, any limits, when contributions begin, and whether employer contributions vest over time. Your benefits or plan administrator can explain the terms that apply to you.",
+        ],
+      },
+      {
+        key: "importantConsiderations",
+        title: "Important considerations",
+        body: [
+          "Contribution options, investment choices, tax treatment, and withdrawal rules can vary. This lesson explains the concept and does not tell you how much to contribute or which investments to select.",
+        ],
+      },
+    ],
+    nextSteps: [
+      {
+        label: "Review your Plan",
+        href: "/plan",
+        description: "Keep the availability of your workplace plan and match up to date.",
+      },
+    ],
+    relatedSlugs: ["investing-basics"],
+  },
+  {
+    slug: "investing-basics",
+    title: "Investing basics",
+    summary: "Build a simple vocabulary for long-term investing before making decisions.",
+    topic: "Investing",
+    estimatedMinutes: 5,
+    sections: [
+      {
+        key: "whatItIs",
+        title: "What it is",
+        body: [
+          "Investing means putting money into assets with the expectation that they may grow or produce income over time. Common examples include stocks, bonds, and funds that hold many investments.",
+        ],
+      },
+      {
+        key: "whyItMatters",
+        title: "Why it matters",
+        body: [
+          "Investing involves tradeoffs between potential return, time, risk, taxes, and access to money. Learning the vocabulary first can make account options and investment choices less overwhelming.",
+        ],
+      },
+      {
+        key: "whoItIsFor",
+        title: "Who it is for",
+        body: [
+          "This is a starting point for people who are new to investing or want a clearer foundation. It can also help someone prepare questions for an employer plan, brokerage, or qualified professional.",
+        ],
+      },
+      {
+        key: "howItWorks",
+        title: "How it works",
+        body: [
+          "An account is the container that holds investments, while an investment is what is held inside it. Different account types and investments have different rules, costs, risks, and tax treatment.",
+        ],
+      },
+      {
+        key: "importantConsiderations",
+        title: "Important considerations",
+        body: [
+          "Investment values can go up or down, and past performance does not guarantee future results. This lesson is education only; it does not recommend a particular account or investment.",
+        ],
+      },
+    ],
+    nextSteps: [
+      {
+        label: "Explore Invest",
+        href: "/invest",
+        description: "Continue with Cardinal's investing education entry point.",
+      },
+    ],
+    relatedSlugs: ["employer-match"],
+  },
 ];
 
 export function getPublishedLessons() {
