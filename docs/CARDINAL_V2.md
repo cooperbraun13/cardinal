@@ -203,7 +203,7 @@ Use integer minor units or a decimal-safe library/representation for new money c
 
 ### Phase 3 — calculators and investing education
 
-- Add calculator definitions and independently tested formulas. Compound-growth, emergency-fund, and credit-card-interest estimates are now available as pure feature modules; UI calculators and the remaining formulas are future work. The credit-card estimate assumes a constant balance, a 365-day year, and simple daily interest; issuer methods can differ.
+- Add calculator definitions and independently tested formulas. Compound-growth, emergency-fund, credit-card-interest, and employer-match calculations are now available as pure feature modules; UI calculators and the remaining formulas are future work. The credit-card estimate assumes a constant balance, a 365-day year, and simple daily interest; issuer methods can differ. The employer-match estimate assumes one salary percentage cap and does not model plan-specific limits or vesting.
 - Publish reviewed investing education in small, linked learning paths. Employer-match, investing-basics, Roth IRA, Traditional IRA, 401(k), HSA, brokerage account, and ETF lessons are available; further account and investment-topic coverage remains future work.
 - Connect calculator results to relevant lessons without treating outputs as advice.
 
