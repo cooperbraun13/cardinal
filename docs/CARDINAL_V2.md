@@ -183,7 +183,7 @@ CalculatorDefinition
   assumptions, relatedLessonSlugs, version
 ```
 
-Use integer minor units or a decimal-safe library/representation for new money calculations, explicit annual/monthly rate conversions, and clear rounding at presentation boundaries. Each calculator must state what it does not model. Initial calculators can be added independently: compound growth, emergency fund, credit-card interest, employer match, mortgage payment, rent vs. buy, and Roth vs. Traditional comparison.
+Use integer minor units or a decimal-safe library/representation for new money calculations, explicit annual/monthly rate conversions, and clear rounding at presentation boundaries. The compound-growth calculator rounds its monetary result fields to cents at the output boundary. Each calculator must state what it does not model. Initial calculators can be added independently: compound growth, emergency fund, credit-card interest, employer match, mortgage payment, rent vs. buy, and Roth vs. Traditional comparison.
 
 ## Implementation roadmap
 
@@ -203,7 +203,7 @@ Use integer minor units or a decimal-safe library/representation for new money c
 
 ### Phase 3 — calculators and investing education
 
-- Add calculator definitions and independently tested formulas.
+- Add calculator definitions and independently tested formulas. The first compound-growth calculation is now available as a pure feature module; UI calculators and the remaining formulas are future work.
 - Publish reviewed investing education in small, linked learning paths. Employer-match, investing-basics, Roth IRA, Traditional IRA, 401(k), HSA, brokerage account, and ETF lessons are available; further account and investment-topic coverage remains future work.
 - Connect calculator results to relevant lessons without treating outputs as advice.
 
