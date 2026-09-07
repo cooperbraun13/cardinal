@@ -518,6 +518,22 @@ export const lessons: Lesson[] = [
     ],
     relatedSlugs: ["investing-basics", "roth-ira", "traditional-ira"],
   },
+  {
+    slug: "etfs",
+    title: "ETFs",
+    summary: "Learn how exchange-traded funds pool investments and trade on an exchange.",
+    topic: "Investing",
+    estimatedMinutes: 5,
+    sections: [
+      { key: "whatItIs", title: "What it is", body: ["An exchange-traded fund, or ETF, is an investment fund whose shares trade on an exchange. An ETF can hold a collection of assets, such as stocks or bonds, rather than representing one company."] },
+      { key: "whyItMatters", title: "Why it matters", body: ["ETFs are a common investment type in brokerage and retirement accounts. Learning what a fund holds, how it trades, and what it costs helps make the term less confusing."] },
+      { key: "whoItIsFor", title: "Who it is for", body: ["This lesson is for people who are new to investment funds or see ETFs in a workplace-plan or brokerage-account menu."] },
+      { key: "howItWorks", title: "How it works", body: ["An ETF pools investor money into a portfolio managed according to its stated objective. Shares are bought and sold during market hours through an exchange, usually using a brokerage account.", "An ETF's market price can be higher or lower than the value of its underlying assets. Its prospectus and shareholder materials describe the fund's objective, holdings, risks, and expenses."] },
+      { key: "importantConsiderations", title: "Important considerations", body: ["An ETF can offer exposure to many assets, but it does not automatically make an investment diversified or low risk. Funds can have different strategies, holdings, expenses, and risks.", "This lesson is educational and does not recommend a fund or trade. Review current fund disclosures and consider qualified help for decisions specific to you."] },
+    ],
+    nextSteps: [{ label: "Learn brokerage-account basics", href: "/learn/brokerage-accounts", description: "See how a brokerage account can hold investments such as ETFs." }],
+    relatedSlugs: ["brokerage-accounts", "investing-basics"],
+  },
 ];
 
 export function getPublishedLessons() {
