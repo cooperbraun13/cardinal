@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import type { FinancialProfileValues } from "@/features/profile/types";
 
 const profileSelect = {
+  profileVersion: true,
   employmentStatus: true,
   annualIncomeRange: true,
   savingsRange: true,
@@ -42,7 +43,7 @@ export async function saveFinancialProfile(
   return prisma.financialProfile.upsert({
     where: { userId },
     create: { userId, ...values },
-    update: values,
+    update: { ...values, profileVersion: { increment: 1 } },
     select: profileSelect,
   });
 }

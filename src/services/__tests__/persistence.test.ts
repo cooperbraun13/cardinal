@@ -218,7 +218,10 @@ describe("financial profile persistence", () => {
       employmentStatus: "employed",
       annualIncomeRange: "50000_to_74999",
       creditCardDebtStatus: "some",
+      profileVersion: 1,
     });
+    const updated = await profileRoute.PUT(request(profileInput({ riskComfort: "growth" }), "PUT"));
+    expect(await updated.json()).toMatchObject({ profileVersion: 2, riskComfort: "growth" });
 
     const other = await db.user.create({
       data: {
@@ -258,6 +261,8 @@ describe("financial profile persistence", () => {
     expect(
       await db.financialProfile.findUnique({ where: { userId } }),
     ).toBeNull();
+    const recreated = await profileRoute.PUT(request(profileInput({ employmentStatus: "student" }), "PUT"));
+    expect(await recreated.json()).toMatchObject({ profileVersion: 1, employmentStatus: "student" });
   });
 });
 
