@@ -55,6 +55,11 @@ describe("Cardinal Plan rules", () => {
     ]);
     expect(recommendations.every((recommendation) => recommendation.whySuggested)).toBe(true);
     expect(recommendations.every((recommendation) => recommendation.action)).toBe(true);
+    expect(Object.fromEntries(recommendations.map(({ id, href }) => [id, href]))).toMatchObject({
+      "start-emergency-savings": "/learn/emergency-fund",
+      "learn-employer-match": "/learn/employer-match",
+      "learn-investing-basics": "/learn/investing-basics",
+    });
   });
 
   it("does not show an employer-match step when either availability answer is unknown", () => {
