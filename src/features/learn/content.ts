@@ -259,7 +259,67 @@ export const lessons: Lesson[] = [
         description: "Continue with Cardinal's investing education entry point.",
       },
     ],
-    relatedSlugs: ["employer-match"],
+    relatedSlugs: ["employer-match", "roth-ira"],
+  },
+  {
+    slug: "roth-ira",
+    title: "Roth IRAs",
+    summary: "Learn the basic rules and questions to consider before opening a Roth IRA.",
+    topic: "Investing",
+    estimatedMinutes: 6,
+    sections: [
+      {
+        key: "whatItIs",
+        title: "What it is",
+        body: [
+          "A Roth IRA is an individual retirement account. Contributions are generally made with money that has already been taxed, and qualified distributions can receive different tax treatment under federal tax rules.",
+          "The account is a container. It can hold investments, and the account's tax rules are separate from the risks and costs of the investments inside it.",
+        ],
+      },
+      {
+        key: "whyItMatters",
+        title: "Why it matters",
+        body: [
+          "A Roth IRA is one of several account types people may encounter while planning for retirement. Knowing how its contribution and withdrawal rules work can help you ask clearer questions before you make a decision.",
+        ],
+      },
+      {
+        key: "whoItIsFor",
+        title: "Who it is for",
+        body: [
+          "This lesson is for people who are learning about retirement accounts or comparing the account types available to them. Whether someone can contribute, and how much, can depend on income, tax filing status, compensation, and current tax rules.",
+        ],
+      },
+      {
+        key: "howItWorks",
+        title: "How it works",
+        body: [
+          "A person opens a Roth IRA with an eligible provider and chooses contributions within the rules that apply to them. Contribution limits and eligibility can change, so current provider materials and IRS guidance matter when checking a specific situation.",
+          "Once money is in the account, the account owner is still responsible for understanding the investments, fees, and risk involved. An account type does not by itself choose investments or guarantee a result.",
+        ],
+      },
+      {
+        key: "importantConsiderations",
+        title: "Important considerations",
+        body: [
+          "A Roth IRA is different from a Roth option in a workplace plan, such as a Roth 401(k). Contribution rules, withdrawal rules, and tax consequences can be complex, especially for conversions or early withdrawals.",
+          "This lesson is educational and does not determine eligibility, recommend an account, or provide tax advice. Check current official guidance and consider qualified help for a decision specific to you.",
+        ],
+      },
+    ],
+    nextSteps: [
+      {
+        label: "Learn investing basics",
+        href: "/learn/investing-basics",
+        description: "See the difference between an investment account and the investments it holds.",
+      },
+      {
+        label: "Explore Invest",
+        href: "/invest",
+        description: "Continue with Cardinal's introductory investing education.",
+      },
+    ],
+    relatedSlugs: ["investing-basics", "employer-match"],
   },
 ];
 
