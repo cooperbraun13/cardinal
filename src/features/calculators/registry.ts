@@ -94,7 +94,7 @@ export const calculatorDefinitions: CalculatorDefinition[] = [
     title: "Roth versus Traditional",
     description: "Compare simplified tax treatment using the same gross contribution.",
     inputFields: [
-      { name: "grossContribution", label: "Gross contribution", unit: "dollars" },
+      { name: "grossContribution", label: "Pre-tax amount considered", unit: "dollars" },
       { name: "currentTaxRatePercent", label: "Current tax rate", unit: "percent" },
       { name: "futureTaxRatePercent", label: "Future tax rate", unit: "percent" },
     ],
