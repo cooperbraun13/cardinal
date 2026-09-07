@@ -630,6 +630,22 @@ export const lessons: Lesson[] = [
     nextSteps: [{ label: "Review credit scores", href: "/learn/credit-scores", description: "Understand one type of information lenders may consider." }],
     relatedSlugs: ["credit-scores", "emergency-fund", "diversification"],
   },
+  {
+    slug: "deductibles",
+    title: "Insurance deductibles",
+    summary: "Understand what a deductible means and how it fits with other health-plan costs.",
+    topic: "Insurance",
+    estimatedMinutes: 5,
+    sections: [
+      { key: "whatItIs", title: "What it is", body: ["A deductible is the amount a person pays for covered health care services before an insurance plan begins paying its share, subject to the plan's rules. Some services may be covered before the deductible."] },
+      { key: "whyItMatters", title: "Why it matters", body: ["A deductible affects how much cash you may need when care happens. Looking at the deductible alone can be misleading because premiums, copayments, coinsurance, and the out-of-pocket maximum also affect total costs."] },
+      { key: "whoItIsFor", title: "Who it is for", body: ["This lesson is for anyone comparing health-plan benefits or reading an insurance summary. Deductibles can differ by plan, service, network, person, or family."] },
+      { key: "howItWorks", title: "How it works", body: ["After covered in-network spending reaches the deductible, the plan may begin sharing costs through copayments or coinsurance. The plan's allowed amounts and coverage rules determine what counts.", "An out-of-pocket maximum is a separate limit for certain covered in-network costs during a plan year. Premiums and non-covered care generally do not count toward it."] },
+      { key: "importantConsiderations", title: "Important considerations", body: ["A lower deductible often comes with a higher premium, but the tradeoff varies by plan. Separate prescription or family deductibles and out-of-network rules can change the picture.", "This lesson is educational and does not compare plans or predict health costs. Read current plan documents and ask the insurer or benefits administrator about unclear terms."] },
+    ],
+    nextSteps: [{ label: "Learn about HSAs", href: "/learn/hsa", description: "Understand an account sometimes paired with eligible high-deductible plans." }],
+    relatedSlugs: ["hsa", "mortgages", "emergency-fund"],
+  },
 ];
 
 export function getPublishedLessons() {
