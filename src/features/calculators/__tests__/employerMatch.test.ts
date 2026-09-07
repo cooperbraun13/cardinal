@@ -17,4 +17,8 @@ describe("calculateEmployerMatch", () => {
   it("rejects negative inputs", () => {
     expect(() => calculateEmployerMatch({ annualSalary: -1, employeeContributionPercent: 6, employerMatchPercent: 50, employerMatchCapPercent: 6 })).toThrow();
   });
+
+  it("rejects percentages above 100", () => {
+    expect(() => calculateEmployerMatch({ annualSalary: 60000, employeeContributionPercent: 101, employerMatchPercent: 50, employerMatchCapPercent: 6 })).toThrow();
+  });
 });
