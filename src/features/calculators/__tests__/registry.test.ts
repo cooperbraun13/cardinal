@@ -3,8 +3,8 @@ import { calculatorDefinitions, getCalculatorBySlug } from "@/features/calculato
 
 describe("calculator registry", () => {
   it("describes every current pure calculator exactly once", () => {
-    expect(calculatorDefinitions).toHaveLength(6);
-    expect(new Set(calculatorDefinitions.map((calculator) => calculator.slug)).size).toBe(6);
+    expect(calculatorDefinitions).toHaveLength(7);
+    expect(new Set(calculatorDefinitions.map((calculator) => calculator.slug)).size).toBe(7);
     expect(calculatorDefinitions.every((calculator) => calculator.version >= 1 && calculator.inputFields.length > 0)).toBe(true);
   });
 

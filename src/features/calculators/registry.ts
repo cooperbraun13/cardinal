@@ -17,6 +17,23 @@ export type CalculatorDefinition = {
 
 export const calculatorDefinitions: CalculatorDefinition[] = [
   {
+    id: "rent-vs-buy",
+    slug: "rent-vs-buy",
+    title: "Rent versus buy",
+    description: "Compare simplified rent and home-buying costs over a selected period.",
+    inputFields: [
+      { name: "monthlyRent", label: "Monthly rent", unit: "dollars" },
+      { name: "homePrice", label: "Home price", unit: "dollars" },
+      { name: "downPayment", label: "Down payment", unit: "dollars" },
+      { name: "mortgageRatePercent", label: "Mortgage rate", unit: "percent" },
+      { name: "years", label: "Years", unit: "years" },
+      { name: "annualPropertyTaxAndInsurance", label: "Annual property tax and insurance", unit: "dollars" },
+    ],
+    assumptions: ["Fixed-rate principal and interest plus stated property tax and insurance; appreciation, maintenance, closing costs, taxes, and investment opportunity costs are excluded."],
+    relatedLessonSlugs: ["mortgages"],
+    version: 1,
+  },
+  {
     id: "compound-growth",
     slug: "compound-growth",
     title: "Compound growth",
