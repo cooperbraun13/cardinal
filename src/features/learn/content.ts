@@ -646,6 +646,22 @@ export const lessons: Lesson[] = [
     nextSteps: [{ label: "Learn about HSAs", href: "/learn/hsa", description: "Understand an account sometimes paired with eligible high-deductible plans." }],
     relatedSlugs: ["hsa", "mortgages", "emergency-fund"],
   },
+  {
+    slug: "insurance",
+    title: "Insurance basics",
+    summary: "Learn how policies trade premiums for protection against covered risks.",
+    topic: "Insurance",
+    estimatedMinutes: 6,
+    sections: [
+      { key: "whatItIs", title: "What it is", body: ["Insurance is a contract that helps manage financial risk. You pay a premium to an insurer, and the policy describes what the insurer may pay when a covered loss or event happens."] },
+      { key: "whyItMatters", title: "Why it matters", body: ["Insurance can help keep one unexpected event from becoming an unaffordable bill. Understanding coverage, exclusions, deductibles, limits, and claims makes a policy easier to evaluate."] },
+      { key: "whoItIsFor", title: "Who it is for", body: ["This lesson is for people learning about health, auto, renters, homeowners, life, or other insurance policies. Each type has different rules and risks."] },
+      { key: "howItWorks", title: "How it works", body: ["A policy lists the people or property protected, covered events, exclusions, coverage limits, deductibles, and the premium. If a covered event happens, the policy and claims process determine what the insurer pays and what remains the policyholder's responsibility.", "Premiums can reflect the insurer's assessment of risk and the amount of coverage selected. A higher deductible may lower a premium in some policies, but it also means paying more out of pocket when a covered claim occurs."] },
+      { key: "importantConsiderations", title: "Important considerations", body: ["A policy does not cover every loss. Limits, exclusions, waiting periods, network rules, policy renewal terms, and non-covered costs can matter as much as the premium.", "This lesson is educational and does not recommend coverage or an insurer. Read the policy and ask the insurer, agent, or state regulator about terms you do not understand."] },
+    ],
+    nextSteps: [{ label: "Learn about deductibles", href: "/learn/deductibles", description: "See how one common cost-sharing term works." }],
+    relatedSlugs: ["deductibles", "hsa", "mortgages"],
+  },
 ];
 
 export function getPublishedLessons() {
