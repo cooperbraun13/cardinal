@@ -17,7 +17,7 @@ export default function CalculatorsPage() {
               <p className="eyebrow">Calculator</p>
               <h3 className="mt-design-md text-xl font-medium tracking-tight">{calculator.title}</h3>
               <p className="mt-design-xs text-sm leading-6 text-muted-foreground">{calculator.description}</p>
-              {calculator.slug === "compound-growth" ? <Link href={`/calculators/${calculator.slug}`} className="text-link mt-design-sm">Open calculator <ArrowRightIcon className="size-4" /></Link> : <p className="mt-design-sm text-xs text-muted-foreground">Guided version coming next.</p>}
+              {calculator.slug === "compound-growth" || calculator.slug === "emergency-fund" ? <Link href={`/calculators/${calculator.slug}`} className="text-link mt-design-sm">Open calculator <ArrowRightIcon className="size-4" /></Link> : <p className="mt-design-sm text-xs text-muted-foreground">Guided version coming next.</p>}
             </article>
           ))}
         </div>
