@@ -662,6 +662,22 @@ export const lessons: Lesson[] = [
     nextSteps: [{ label: "Learn about deductibles", href: "/learn/deductibles", description: "See how one common cost-sharing term works." }],
     relatedSlugs: ["deductibles", "hsa", "mortgages"],
   },
+  {
+    slug: "taxes",
+    title: "Taxes basics",
+    summary: "Build a simple vocabulary for income, deductions, credits, and tax records.",
+    topic: "Taxes",
+    estimatedMinutes: 6,
+    sections: [
+      { key: "whatItIs", title: "What it is", body: ["Taxes are amounts collected by governments under tax rules. A tax return reports information such as income, deductions, credits, and payments for a tax year so the final amount can be determined."] },
+      { key: "whyItMatters", title: "Why it matters", body: ["Tax treatment can affect take-home pay, savings, investing, and major financial decisions. Understanding the vocabulary helps you find the right questions and records."] },
+      { key: "whoItIsFor", title: "Who it is for", body: ["This lesson is for anyone learning tax basics, especially people with wages, investment income, retirement distributions, freelance work, or major life changes."] },
+      { key: "howItWorks", title: "How it works", body: ["Income documents help report money received. Deductions may reduce income subject to tax, while credits may reduce the tax calculated. Withholding and estimated payments are payments made during the year that are compared with the final amount.", "A return can result in a balance due or a refund, depending on the rules and payments for that year. Keeping records supports the income, expenses, deductions, and credits reported."] },
+      { key: "importantConsiderations", title: "Important considerations", body: ["Tax rules, filing requirements, deadlines, and available deductions or credits can change by year and differ by jurisdiction. Investment income, sales, distributions, contributions, and other financial events can create reporting requirements, even when no cash was withdrawn.", "This lesson is educational and does not calculate taxes or provide tax advice. Use current official guidance and consider qualified tax help for a decision specific to you."] },
+    ],
+    nextSteps: [{ label: "Review your profile context", href: "/profile", description: "Keep only the financial context you choose to share with Cardinal." }],
+    relatedSlugs: ["roth-ira", "traditional-ira", "hsa"],
+  },
 ];
 
 export function getPublishedLessons() {
