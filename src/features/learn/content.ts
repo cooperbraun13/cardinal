@@ -582,6 +582,22 @@ export const lessons: Lesson[] = [
     nextSteps: [{ label: "Learn about stocks", href: "/learn/stocks", description: "Compare lending to an issuer with owning part of a company." }],
     relatedSlugs: ["stocks", "index-funds", "etfs"],
   },
+  {
+    slug: "diversification",
+    title: "Diversification",
+    summary: "Learn how spreading investments can reduce concentration risk without removing all risk.",
+    topic: "Investing",
+    estimatedMinutes: 5,
+    sections: [
+      { key: "whatItIs", title: "What it is", body: ["Diversification means spreading money across different investments, asset types, companies, industries, or regions so that one holding has less influence on the whole portfolio."] },
+      { key: "whyItMatters", title: "Why it matters", body: ["If one investment performs poorly, other holdings may offset some of the effect. Diversification can reduce concentration risk, but it cannot guarantee that a portfolio will not lose value when markets fall."] },
+      { key: "whoItIsFor", title: "Who it is for", body: ["This lesson is for anyone learning how portfolios are structured, including people reviewing workplace plans, IRAs, brokerage accounts, or funds."] },
+      { key: "howItWorks", title: "How it works", body: ["People can diversify across asset types such as stocks, bonds, and cash, and within an asset type by holding different companies or sectors. Mutual funds and ETFs can make it easier to own portions of many investments, but a narrowly focused fund may still be concentrated.", "A portfolio's mix is sometimes called asset allocation. Time horizon and risk comfort are among the personal factors people consider when thinking about that mix."] },
+      { key: "importantConsiderations", title: "Important considerations", body: ["Owning several funds does not automatically create diversification if their holdings overlap. Diversification also does not prevent losses, remove fees, or ensure a particular return.", "This lesson is educational and does not recommend an allocation or investment. Review actual holdings and current disclosures for decisions specific to you."] },
+    ],
+    nextSteps: [{ label: "Review index funds", href: "/learn/index-funds", description: "See how a fund can provide exposure to a group of securities." }],
+    relatedSlugs: ["index-funds", "stocks", "bonds"],
+  },
 ];
 
 export function getPublishedLessons() {
