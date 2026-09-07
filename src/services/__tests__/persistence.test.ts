@@ -44,6 +44,8 @@ const profileInput = (extra = {}) => ({
   employerMatchStatus: "not_sure",
   investingExperience: "new",
   riskComfort: "not_sure",
+  primaryGoal: "understand_money",
+  investmentAccountType: "none",
   ...extra,
 });
 
@@ -218,7 +220,12 @@ describe("financial profile persistence", () => {
       employmentStatus: "employed",
       annualIncomeRange: "50000_to_74999",
       creditCardDebtStatus: "some",
+      profileVersion: 1,
+      primaryGoal: "understand_money",
+      investmentAccountType: "none",
     });
+    const updated = await profileRoute.PUT(request(profileInput({ riskComfort: "growth" }), "PUT"));
+    expect(await updated.json()).toMatchObject({ profileVersion: 2, riskComfort: "growth" });
 
     const other = await db.user.create({
       data: {
@@ -247,6 +254,20 @@ describe("financial profile persistence", () => {
         )
       ).status,
     ).toBe(400);
+    expect(
+      (
+        await profileRoute.PUT(
+          request(profileInput({ primaryGoal: "not_a_goal" }), "PUT"),
+        )
+      ).status,
+    ).toBe(400);
+    expect(
+      (
+        await profileRoute.PUT(
+          request(profileInput({ investmentAccountType: "account_number" }), "PUT"),
+        )
+      ).status,
+    ).toBe(400);
 
     await profileRoute.PUT(request(profileInput(), "PUT"));
     const emptyProfile = Object.fromEntries(
@@ -258,6 +279,8 @@ describe("financial profile persistence", () => {
     expect(
       await db.financialProfile.findUnique({ where: { userId } }),
     ).toBeNull();
+    const recreated = await profileRoute.PUT(request(profileInput({ employmentStatus: "student" }), "PUT"));
+    expect(await recreated.json()).toMatchObject({ profileVersion: 1, employmentStatus: "student" });
   });
 });
 

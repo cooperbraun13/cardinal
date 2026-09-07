@@ -52,6 +52,23 @@ export const RISK_COMFORT_LEVELS = [
   "growth",
 ] as const;
 
+export const PRIMARY_GOALS = [
+  "reduce_debt",
+  "build_emergency_fund",
+  "start_investing",
+  "buy_home",
+  "understand_money",
+] as const;
+
+export const INVESTMENT_ACCOUNT_TYPES = [
+  "none",
+  "employer_plan",
+  "ira",
+  "brokerage",
+  "hsa",
+  "multiple",
+] as const;
+
 export const PROFILE_OPTION_LABELS: Record<string, string> = {
   employed: "Employed",
   self_employed: "Self-employed",
@@ -84,4 +101,14 @@ export const PROFILE_OPTION_LABELS: Record<string, string> = {
   conservative: "Prefer fewer ups and downs",
   balanced: "Comfortable with some ups and downs",
   growth: "Comfortable with larger ups and downs",
+  reduce_debt: "Reduce debt",
+  build_emergency_fund: "Build an emergency fund",
+  start_investing: "Start investing",
+  buy_home: "Prepare to buy a home",
+  understand_money: "Understand money basics",
+  employer_plan: "Employer plan (such as a 401(k))",
+  ira: "IRA",
+  brokerage: "Brokerage account",
+  hsa: "HSA",
+  multiple: "More than one account type",
 };

@@ -23,9 +23,9 @@ User
 
 ## FinancialProfile
 
-`FinancialProfile` is an optional one-to-one record owned by `User`. The first version stores only optional ranges and simple context: employment status, income and savings ranges, emergency-fund and debt status, employer retirement-plan/match availability, investing experience, and risk comfort. An all-empty update removes the record instead of representing unanswered fields as zero values.
+`FinancialProfile` is an optional one-to-one record owned by `User`. The first version stores only optional ranges and simple context: employment status, income and savings ranges, emergency-fund and debt status, employer retirement-plan/match availability, investing experience, risk comfort, one primary goal, and one existing investment-account type. An all-empty update removes the record instead of representing unanswered fields as zero values.
 
-The profile does not store account credentials, exact balances, employer identity, investment holdings, or inferred information from a user's cards. Each field is nullable because a missing answer is distinct from a negative answer. The `profileVersion` field supports deliberate future changes to the question set. Goals and profile-answer history have not been added yet; see [Cardinal v2 foundation](CARDINAL_V2.md#financial-profile-direction) for the privacy constraints and future direction.
+The profile does not store account credentials, account numbers, exact balances, employer identity, investment holdings, or inferred information from a user's cards. Each field is nullable because a missing answer is distinct from a negative answer. The `profileVersion` field supports deliberate future changes to the question set. Profile-answer history has not been added yet; see [Cardinal v2 foundation](CARDINAL_V2.md#financial-profile-direction) for the privacy constraints and future direction. New profile fields are optional at the API boundary so older clients can continue sending the original question set.
 
 ## Models
 

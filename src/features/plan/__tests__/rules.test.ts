@@ -15,6 +15,8 @@ const profile = (
   employerMatchStatus: null,
   investingExperience: null,
   riskComfort: null,
+  primaryGoal: null,
+  investmentAccountType: null,
   ...changes,
 });
 
@@ -70,6 +72,25 @@ describe("Cardinal Plan rules", () => {
     expect(recommendations.map((recommendation) => recommendation.id)).not.toContain(
       "learn-employer-match",
     );
+  });
+
+  it("adds one explainable step for the selected primary goal", () => {
+    const recommendations = buildCardinalPlan(profile({ primaryGoal: "buy_home" }));
+
+    expect(recommendations.find((recommendation) => recommendation.id === "goal-buy_home")).toMatchObject({
+      id: "goal-buy_home",
+      href: "/learn/mortgages",
+      inputsUsed: ["primaryGoal"],
+    });
+    expect(recommendations.find((recommendation) => recommendation.id === "goal-buy_home")?.whySuggested).toContain("primary goal");
+    expect(recommendations.find((recommendation) => recommendation.id === "goal-buy_home")?.whySuggested).toBe("You selected “prepare to buy a home” as your primary goal.");
+  });
+
+  it("does not duplicate a goal already covered by a focused rule", () => {
+    const recommendations = buildCardinalPlan(profile({ primaryGoal: "start_investing", investingExperience: "new" }));
+
+    expect(recommendations.map((recommendation) => recommendation.id)).toContain("learn-investing-basics");
+    expect(recommendations.map((recommendation) => recommendation.id)).not.toContain("goal-start_investing");
   });
 
   it("keeps one general next step when no focused rule applies", () => {

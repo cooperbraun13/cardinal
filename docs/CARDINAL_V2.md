@@ -119,13 +119,13 @@ Each lesson uses a stable slug and supports:
 
 Lesson prose should distinguish education from personalized recommendations. It should state assumptions, avoid guarantees, explain terms before using them, and link to a next action only when Cardinal can support it. A lesson is not a calculator and does not embed financial-profile rules.
 
-The five currently published lessons cover APR, credit utilization, emergency funds, employer 401(k) matches, and investing basics. Future reviewed sets may add Roth IRA, Traditional IRA, 401(k), HSA, brokerage accounts, ETFs, index funds, stocks, bonds, diversification, credit scores, mortgages, deductibles, insurance, and taxes.
+The twenty currently published lessons cover APR, credit utilization, emergency funds, employer 401(k) matches, investing basics, Roth IRAs, Traditional IRAs, 401(k) plans, health savings accounts, brokerage accounts, ETFs, index funds, stocks, bonds, diversification, credit scores, mortgages, deductibles, insurance, and taxes. The remaining planned education work is deeper topic coverage and guided learning paths.
 
 ## Financial profile direction
 
-The first profile migration is implemented. Profile information remains sensitive and optional: the current form stores only ranges and simple context, and an all-empty update removes the profile record. It does not collect account credentials, exact balances, employer identity, or investment holdings.
+The first profile migration is implemented. Profile information remains sensitive and optional: the current form stores only ranges and simple context, and an all-empty update removes the profile record. Updates increment the profile version for future plan and revision tracking. It does not collect account credentials, exact balances, employer identity, or investment holdings.
 
-The implemented initial record is a separate one-to-one `FinancialProfile` owned by `User`. Future child tables should be added only where answers are truly repeating. Store ranges and simple enums when exact amounts are unnecessary for the intended guidance.
+The implemented initial record is a separate one-to-one `FinancialProfile` owned by `User`. It now includes one optional primary goal and one optional existing investment-account type as simple enums so Plan and education paths can prioritize a direction without collecting exact balances or account numbers. Future child tables should be added only where answers are truly repeating. Store ranges and simple enums when exact amounts are unnecessary for the intended guidance.
 
 | Area | Minimal useful data | Avoid by default |
 | --- | --- | --- |
@@ -178,12 +178,13 @@ Calculators are separate from lessons and plan rules. A calculator has a small i
 
 ```text
 CalculatorDefinition
-  id, slug, title, description, inputSchema,
-  calculate(input) → result,
+  id, slug, title, description, inputFields,
   assumptions, relatedLessonSlugs, version
+
+The current registry lives in `src/features/calculators/registry.ts`. Pure calculation functions remain separate from this metadata so UI forms can be added without moving financial logic.
 ```
 
-Use integer minor units or a decimal-safe library/representation for new money calculations, explicit annual/monthly rate conversions, and clear rounding at presentation boundaries. Each calculator must state what it does not model. Initial calculators can be added independently: compound growth, emergency fund, credit-card interest, employer match, mortgage payment, rent vs. buy, and Roth vs. Traditional comparison.
+Use integer minor units or a decimal-safe library/representation for new money calculations, explicit annual/monthly rate conversions, and clear rounding at presentation boundaries. The compound-growth calculator rounds its monetary result fields to cents at the output boundary. Each calculator must state what it does not model. Initial calculators can be added independently: compound growth, emergency fund, credit-card interest, employer match, mortgage payment, rent vs. buy, and Roth vs. Traditional comparison.
 
 ## Implementation roadmap
 
@@ -203,8 +204,9 @@ Use integer minor units or a decimal-safe library/representation for new money c
 
 ### Phase 3 — calculators and investing education
 
-- Add calculator definitions and independently tested formulas.
-- Publish reviewed investing education in small, linked learning paths. The initial employer-match and investing-basics lessons are available; account and investment-topic coverage remains future work.
+- Add calculator definitions and independently tested formulas. The registry and pure modules cover compound growth, emergency-fund, credit-card-interest, employer-match, mortgage-payment, rent-versus-buy, and Roth-versus-Traditional comparisons; user-facing forms are now available for all seven at `/calculators`. The emergency-fund form currently presents a 0–24 month input range, the credit-card form presents 0–100% APR and 0–365 days, the employer-match form presents 0–100% percentage inputs, and the mortgage and rent-versus-buy forms present 0–50% rates and 1–40 year terms. These are aligned with the pure-function validation for employer-match percentages; the other form ranges are presentation bounds while those pure functions remain reusable for finite, nonnegative values supplied by another context. The credit-card estimate assumes a constant balance, a 365-day year, and simple daily interest; issuer methods can differ. The employer-match estimate assumes one salary percentage cap and does not model plan-specific limits or vesting. Mortgage results cover principal and interest only; taxes, insurance, mortgage insurance, fees, and escrow are excluded. The rent-versus-buy estimate compares cash paid: down payment, mortgage payments, and stated property tax and insurance. It excludes home equity, appreciation, maintenance, closing costs, and income or capital-gains taxes. The Roth comparison uses the same pre-tax amount with illustrative marginal rates and excludes growth, deductions, contribution limits, and account-specific rules.
+- Mortgage terms are converted to whole monthly payments by rounding years × 12, matching the compound-growth calculator's term conversion.
+- Publish reviewed investing education in small, linked learning paths. The current catalog includes credit, savings, retirement accounts, investing products, diversification, credit scores, mortgages, deductibles, insurance, and taxes; guided learning paths and progress remain future work.
 - Connect calculator results to relevant lessons without treating outputs as advice.
 
 ### Phase 4 — broader money domains

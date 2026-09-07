@@ -9,6 +9,8 @@ export type FinancialProfileValues = {
   employerMatchStatus: string | null;
   investingExperience: string | null;
   riskComfort: string | null;
+  primaryGoal: string | null;
+  investmentAccountType: string | null;
 };
 
 export const emptyFinancialProfile: FinancialProfileValues = {
@@ -22,4 +24,6 @@ export const emptyFinancialProfile: FinancialProfileValues = {
   employerMatchStatus: null,
   investingExperience: null,
   riskComfort: null,
+  primaryGoal: null,
+  investmentAccountType: null,
 };

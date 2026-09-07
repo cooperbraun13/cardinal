@@ -1,0 +1,23 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { ArrowRightIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Field } from "@/components/forms/Field";
+import { Input } from "@/components/ui/input";
+import { calculateEmployerMatch } from "@/features/calculators/employerMatch";
+
+const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+
+export function EmployerMatchCalculator() {
+  const [values, setValues] = useState({ annualSalary: "60000", employeeContributionPercent: "6", employerMatchPercent: "50", employerMatchCapPercent: "6" });
+  const [result, setResult] = useState<ReturnType<typeof calculateEmployerMatch> | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  function update(name: keyof typeof values, value: string) { setValues((current) => ({ ...current, [name]: value })); }
+  function calculate() {
+    try { setResult(calculateEmployerMatch({ annualSalary: Number(values.annualSalary), employeeContributionPercent: Number(values.employeeContributionPercent), employerMatchPercent: Number(values.employerMatchPercent), employerMatchCapPercent: Number(values.employerMatchCapPercent) })); setError(null); }
+    catch (calculationError) { setResult(null); setError(calculationError instanceof Error ? calculationError.message : "Check your inputs and try again."); }
+  }
+  return <div className="grid gap-design-md lg:grid-cols-[minmax(0,1fr)_minmax(18rem,.8fr)]"><section className="panel panel-body" aria-labelledby="match-inputs-heading"><h2 id="match-inputs-heading" className="section-title">Illustrate a match</h2><p className="mt-design-xs text-sm leading-6 text-muted-foreground">See how a simple salary percentage cap affects annual contributions.</p><form onSubmit={(event) => { event.preventDefault(); calculate(); }}><div className="mt-design-md grid gap-design-sm sm:grid-cols-2"><Field label="Annual salary" hint="Before-tax salary"><Input required type="number" min="0" max="1000000000" step="1000" value={values.annualSalary} onChange={(event) => update("annualSalary", event.target.value)} aria-invalid={Boolean(error)} aria-describedby={error ? "match-error" : undefined} /></Field><Field label="Employee contribution" hint="Percent of salary"><Input required type="number" min="0" max="100" step="0.1" value={values.employeeContributionPercent} onChange={(event) => update("employeeContributionPercent", event.target.value)} aria-invalid={Boolean(error)} aria-describedby={error ? "match-error" : undefined} /></Field><Field label="Employer match rate" hint="For example, 50% means $0.50 per $1"><Input required type="number" min="0" max="100" step="0.1" value={values.employerMatchPercent} onChange={(event) => update("employerMatchPercent", event.target.value)} aria-invalid={Boolean(error)} aria-describedby={error ? "match-error" : undefined} /></Field><Field label="Match cap" hint="Maximum salary percentage matched"><Input required type="number" min="0" max="100" step="0.1" value={values.employerMatchCapPercent} onChange={(event) => update("employerMatchCapPercent", event.target.value)} aria-invalid={Boolean(error)} aria-describedby={error ? "match-error" : undefined} /></Field></div><Button type="submit" className="mt-design-md">Calculate</Button>{error && <p id="match-error" role="alert" className="mt-design-sm text-sm text-destructive">{error}</p>}</form></section><section className="panel panel-body" aria-live="polite" aria-labelledby="match-result-heading"><p className="eyebrow">Annual illustration</p><h2 id="match-result-heading" className="mt-design-xs section-title">{result ? currency.format(result.totalAnnualContribution) : "Your total contribution"}</h2>{result ? <dl className="mt-design-md grid gap-design-sm text-sm"><div className="flex justify-between gap-4 border-b border-border pb-design-xs"><dt className="text-muted-foreground">Your contribution</dt><dd className="font-medium">{currency.format(result.employeeContribution)}</dd></div><div className="flex justify-between gap-4"><dt className="text-muted-foreground">Employer contribution</dt><dd className="font-medium">{currency.format(result.employerContribution)}</dd></div></dl> : <p className="mt-design-xs text-sm leading-6 text-muted-foreground">Enter your salary and plan assumptions to see the illustration.</p>}<div className="mt-design-md border-t border-border pt-design-sm"><p className="text-xs leading-5 text-muted-foreground">This simplified example excludes plan-specific limits, vesting, and payroll timing.</p><Link href="/learn/employer-match" className="text-link mt-design-sm">Learn about employer matches <ArrowRightIcon className="size-4" /></Link></div></section></div>;
+}
