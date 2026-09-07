@@ -534,6 +534,22 @@ export const lessons: Lesson[] = [
     nextSteps: [{ label: "Learn brokerage-account basics", href: "/learn/brokerage-accounts", description: "See how a brokerage account can hold investments such as ETFs." }],
     relatedSlugs: ["brokerage-accounts", "investing-basics"],
   },
+  {
+    slug: "index-funds",
+    title: "Index funds",
+    summary: "Learn how a fund can aim to track a market index instead of selecting investments actively.",
+    topic: "Investing",
+    estimatedMinutes: 5,
+    sections: [
+      { key: "whatItIs", title: "What it is", body: ["An index fund is a mutual fund or ETF that seeks to track the returns of a market index. A market index measures the performance of a group of securities, and an index fund provides an indirect way to invest in that group."] },
+      { key: "whyItMatters", title: "Why it matters", body: ["Index funds are a common term in workplace plans, retirement accounts, and brokerage accounts. Understanding the fund's stated index and holdings helps explain what the fund is designed to follow."] },
+      { key: "whoItIsFor", title: "Who it is for", body: ["This lesson is for people who are learning about fund choices and want to understand the difference between an index-tracking and actively managed approach."] },
+      { key: "howItWorks", title: "How it works", body: ["An index fund follows rules intended to track a particular index. Some funds hold every security in an index; others hold a sample. Index funds are often described as passive, but they still have a specific objective, holdings, and management process.", "An index fund can be structured as an ETF or mutual fund. Its prospectus describes the index, strategy, holdings, expenses, and risks."] },
+      { key: "importantConsiderations", title: "Important considerations", body: ["Not all index funds track the same index or have the same costs. An index fund can lag its index because of fees, trading costs, or tracking error, and it is exposed to the risks of the securities it holds.", "This lesson is educational and does not recommend a fund or strategy. Review current fund disclosures and consider qualified help for decisions specific to you."] },
+    ],
+    nextSteps: [{ label: "Learn about ETFs", href: "/learn/etfs", description: "See how some index funds trade on an exchange." }],
+    relatedSlugs: ["etfs", "brokerage-accounts", "investing-basics"],
+  },
 ];
 
 export function getPublishedLessons() {
