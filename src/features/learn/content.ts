@@ -207,7 +207,7 @@ export const lessons: Lesson[] = [
         description: "Keep the availability of your workplace plan and match up to date.",
       },
     ],
-    relatedSlugs: ["investing-basics"],
+    relatedSlugs: ["investing-basics", "401k"],
   },
   {
     slug: "investing-basics",
@@ -380,6 +380,65 @@ export const lessons: Lesson[] = [
       },
     ],
     relatedSlugs: ["roth-ira", "investing-basics", "employer-match"],
+  },
+  {
+    slug: "401k",
+    title: "401(k) plans",
+    summary: "Understand the workplace retirement plan that may be part of your benefits.",
+    topic: "Investing",
+    estimatedMinutes: 6,
+    sections: [
+      {
+        key: "whatItIs",
+        title: "What it is",
+        body: [
+          "A 401(k) is a workplace retirement plan that can let eligible employees contribute part of their pay to an individual account. The plan's rules, available contribution options, and investment menu are set by the employer's plan documents.",
+        ],
+      },
+      {
+        key: "whyItMatters",
+        title: "Why it matters",
+        body: [
+          "A workplace plan can be an important benefit to understand because it may offer payroll contributions and, in some plans, employer contributions. Knowing the rules helps you see which questions apply to your benefits.",
+        ],
+      },
+      {
+        key: "whoItIsFor",
+        title: "Who it is for",
+        body: [
+          "This lesson is for people who have access to a 401(k), are becoming eligible for one, or want to understand a plan named in their benefits materials.",
+        ],
+      },
+      {
+        key: "howItWorks",
+        title: "How it works",
+        body: [
+          "Many plans let employees choose a payroll contribution amount. A plan may also offer a traditional pre-tax option, a Roth option, or both. Contribution limits, eligibility, withdrawals, and investment choices follow the plan and current tax rules.",
+          "Some plans include employer matching or other employer contributions. Those contributions can have their own eligibility and vesting rules, so the summary plan description is a useful place to check the details.",
+        ],
+      },
+      {
+        key: "importantConsiderations",
+        title: "Important considerations",
+        body: [
+          "Not every employer offers the same features, match, fees, or investment choices. A 401(k) is different from an IRA, and a Roth 401(k) is different from a Roth IRA even though both use the word Roth.",
+          "This lesson is educational. It does not recommend a contribution amount, investment, or withdrawal. Read your current plan materials and consider qualified help for choices specific to you.",
+        ],
+      },
+    ],
+    nextSteps: [
+      {
+        label: "Understand employer matches",
+        href: "/learn/employer-match",
+        description: "Learn which match details to find in your workplace plan materials.",
+      },
+      {
+        label: "Review your Plan",
+        href: "/plan",
+        description: "Keep your workplace-plan context current in Cardinal.",
+      },
+    ],
+    relatedSlugs: ["employer-match", "roth-ira", "traditional-ira"],
   },
 ];
 
