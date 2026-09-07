@@ -1,9 +1,19 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
-import { ChevronDownIcon, LogOutIcon, MenuIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  ChevronDownIcon,
+  LogOutIcon,
+  MenuIcon,
+  HomeIcon,
+  WalletCardsIcon,
+  LandmarkIcon,
+  BookOpenIcon,
+  RouteIcon,
+  UserRoundIcon,
+} from "lucide-react";
 import { apiFetch } from "@/lib/client";
 import { Brand } from "@/components/Brand";
 import { ErrorBanner } from "@/components/ErrorBanner";
@@ -21,10 +31,37 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { PRIMARY_LINKS, getActiveSection } from "@/lib/navigation";
+import {
+  PRIMARY_LINKS,
+  MONEY_LINKS,
+  getActiveSection,
+  isNavigationPath,
+} from "@/lib/navigation";
+
+const SECTION_ICONS: Record<string, typeof HomeIcon> = {
+  "/home": HomeIcon,
+  "/money": WalletCardsIcon,
+  "/invest": LandmarkIcon,
+  "/learn": BookOpenIcon,
+  "/plan": RouteIcon,
+  "/profile": UserRoundIcon,
+};
 
 export function Navigation({ userName }: { userName: string }) {
   const pathname = usePathname();
+  const activeSection = getActiveSection(pathname);
+  const moneyNavRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const nav = moneyNavRef.current;
+    const selected = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!nav || !selected || nav.scrollWidth <= nav.clientWidth) return;
+    // Keep the selected tool visible on direct loads and client-side navigation.
+    nav.scrollLeft +=
+      selected.getBoundingClientRect().left -
+      nav.getBoundingClientRect().left -
+      (nav.clientWidth - selected.clientWidth) / 2;
+  }, [pathname]);
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -45,7 +82,8 @@ export function Navigation({ userName }: { userName: string }) {
 
   function links(mobile = false) {
     return PRIMARY_LINKS.map(({ href, label }) => {
-      const active = getActiveSection(pathname)?.href === href;
+      const active = activeSection?.href === href;
+      const Icon = SECTION_ICONS[href];
       return (
         <Link
           key={href}
@@ -53,15 +91,14 @@ export function Navigation({ userName }: { userName: string }) {
           onClick={() => setOpen(false)}
           aria-current={active ? "page" : undefined}
           className={cn(
-            "relative flex items-center font-semibold uppercase transition-colors hover:text-foreground",
-            mobile
-              ? "min-h-16 border-b border-border text-xl tracking-wide"
-              : "h-16 text-[11px] tracking-[.05em] lg:text-[13px]",
+            "relative flex items-center gap-2 px-3 font-semibold transition-colors hover:bg-muted hover:text-foreground",
+            mobile ? "min-h-16 border-b border-border text-xl" : "h-12 text-sm",
             active
-              ? "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary"
+              ? "bg-muted text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary"
               : "text-muted-foreground",
           )}
         >
+          <Icon className="size-4" aria-hidden="true" />
           {label}
         </Link>
       );
@@ -72,20 +109,19 @@ export function Navigation({ userName }: { userName: string }) {
     <>
       <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-design-xs px-design-xs sm:px-design-md lg:px-design-lg">
-          <Link
-            href="/home"
-            aria-label="Cardinal home"
-            className="shrink-0"
-          >
+          <Link href="/home" aria-label="Cardinal home" className="shrink-0">
             <Brand />
           </Link>
           <nav
             aria-label="Primary"
-            className="hidden items-center gap-design-xs md:flex lg:gap-design-md"
+            className="hidden items-center gap-1 lg:flex"
           >
             {links()}
           </nav>
           <div className="flex items-center gap-design-xxs">
+            <span className="hidden text-sm font-medium min-[360px]:inline lg:hidden">
+              {activeSection?.label}
+            </span>
             <DropdownMenu>
               <DropdownMenuTrigger
                 aria-label={`${userName}, account menu`}
@@ -118,7 +154,7 @@ export function Navigation({ userName }: { userName: string }) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="md:hidden"
+                    className="lg:hidden"
                     aria-label="Open navigation"
                   />
                 }
@@ -137,13 +173,40 @@ export function Navigation({ userName }: { userName: string }) {
                     {links(true)}
                   </nav>
                   <p className="mt-design-xl text-xs text-muted-foreground">
-                    Credit. Considered.
+                    Money, made clear.
                   </p>
                 </div>
               </DialogContent>
             </Dialog>
           </div>
         </div>
+        {activeSection?.href === "/money" && (
+          <nav aria-label="Money navigation" className="border-t border-border">
+            <div
+              ref={moneyNavRef}
+              className="mx-auto flex max-w-[1440px] gap-design-xs overflow-x-auto px-design-xs sm:px-design-md lg:px-design-lg"
+            >
+              {MONEY_LINKS.map(({ href, label }) => {
+                const active = isNavigationPath(pathname, href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-12 shrink-0 items-center border-b-2 px-1 text-xs transition-colors hover:text-foreground",
+                      active
+                        ? "border-foreground font-semibold text-foreground"
+                        : "border-transparent text-muted-foreground",
+                    )}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
+          </nav>
+        )}
       </header>
       {error && (
         <div className="mx-auto w-full max-w-[1376px] px-design-xs pt-design-xs sm:px-design-md lg:px-design-lg">
