@@ -566,6 +566,22 @@ export const lessons: Lesson[] = [
     nextSteps: [{ label: "Learn about index funds", href: "/learn/index-funds", description: "See how a fund can hold many securities." }],
     relatedSlugs: ["index-funds", "etfs", "investing-basics"],
   },
+  {
+    slug: "bonds",
+    title: "Bonds",
+    summary: "Learn how bonds work as loans to governments, municipalities, or companies.",
+    topic: "Investing",
+    estimatedMinutes: 5,
+    sections: [
+      { key: "whatItIs", title: "What it is", body: ["A bond is a debt security, similar to an IOU. When someone buys a bond, they lend money to an issuer, such as a government, municipality, or company."] },
+      { key: "whyItMatters", title: "Why it matters", body: ["Bonds are a common investment type and can appear directly or inside a fund. Understanding the loan relationship helps distinguish bonds from ownership investments such as stocks."] },
+      { key: "whoItIsFor", title: "Who it is for", body: ["This lesson is for people learning basic investment vocabulary or comparing the kinds of assets held by a fund."] },
+      { key: "howItWorks", title: "How it works", body: ["An issuer may promise periodic interest payments and repayment of principal depending on the bond's terms and the issuer's ability to make those payments. Bonds can have different issuers, interest structures, and maturity dates.", "A bond may be sold before maturity. Its market value can be more or less than its face value, and changing interest rates can affect that value."] },
+      { key: "importantConsiderations", title: "Important considerations", body: ["Bonds carry credit, interest-rate, inflation, liquidity, and sometimes call risk. A bond issuer can default, so a stated interest payment is not a guarantee.", "This lesson is educational and does not recommend a bond or fund. Review current disclosures and consider qualified help for decisions specific to you."] },
+    ],
+    nextSteps: [{ label: "Learn about stocks", href: "/learn/stocks", description: "Compare lending to an issuer with owning part of a company." }],
+    relatedSlugs: ["stocks", "index-funds", "etfs"],
+  },
 ];
 
 export function getPublishedLessons() {
