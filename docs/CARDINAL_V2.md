@@ -119,7 +119,7 @@ Each lesson uses a stable slug and supports:
 
 Lesson prose should distinguish education from personalized recommendations. It should state assumptions, avoid guarantees, explain terms before using them, and link to a next action only when Cardinal can support it. A lesson is not a calculator and does not embed financial-profile rules.
 
-The eight currently published lessons cover APR, credit utilization, emergency funds, employer 401(k) matches, investing basics, Roth IRAs, Traditional IRAs, and 401(k) plans. Future reviewed sets may add HSA, brokerage accounts, ETFs, index funds, stocks, bonds, diversification, credit scores, mortgages, deductibles, insurance, and taxes.
+The nine currently published lessons cover APR, credit utilization, emergency funds, employer 401(k) matches, investing basics, Roth IRAs, Traditional IRAs, 401(k) plans, and health savings accounts. Future reviewed sets may add brokerage accounts, ETFs, index funds, stocks, bonds, diversification, credit scores, mortgages, deductibles, insurance, and taxes.
 
 ## Financial profile direction
 
@@ -204,7 +204,7 @@ Use integer minor units or a decimal-safe library/representation for new money c
 ### Phase 3 — calculators and investing education
 
 - Add calculator definitions and independently tested formulas.
-- Publish reviewed investing education in small, linked learning paths. The initial employer-match and investing-basics lessons are available; account and investment-topic coverage remains future work.
+- Publish reviewed investing education in small, linked learning paths. Employer-match, investing-basics, Roth IRA, Traditional IRA, 401(k), and HSA lessons are available; further account and investment-topic coverage remains future work.
 - Connect calculator results to relevant lessons without treating outputs as advice.
 
 ### Phase 4 — broader money domains

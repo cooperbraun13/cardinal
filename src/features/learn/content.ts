@@ -440,6 +440,65 @@ export const lessons: Lesson[] = [
     ],
     relatedSlugs: ["employer-match", "roth-ira", "traditional-ira"],
   },
+  {
+    slug: "hsa",
+    title: "Health savings accounts",
+    summary: "Learn when an HSA may be available and how its health-expense rules work.",
+    topic: "Investing",
+    estimatedMinutes: 6,
+    sections: [
+      {
+        key: "whatItIs",
+        title: "What it is",
+        body: [
+          "A health savings account, or HSA, is a tax-advantaged account for qualified medical expenses. It is separate from a health plan, although eligibility to contribute is tied to health coverage and other rules.",
+        ],
+      },
+      {
+        key: "whyItMatters",
+        title: "Why it matters",
+        body: [
+          "An HSA can appear in benefits materials alongside a high-deductible health plan. Understanding the account can help you recognize which details to check before deciding how to use an employer benefit.",
+        ],
+      },
+      {
+        key: "whoItIsFor",
+        title: "Who it is for",
+        body: [
+          "This lesson is for people whose benefits mention an HSA or high-deductible health plan. Eligibility to contribute can depend on coverage, other health coverage, Medicare enrollment, dependent status, and current rules.",
+        ],
+      },
+      {
+        key: "howItWorks",
+        title: "How it works",
+        body: [
+          "Eligible people can open an HSA with a qualified trustee, and contributions may come from the account holder, an employer, or another person. Funds remain in the account until they are used, even if the account holder changes jobs.",
+          "Distributions used for qualified medical expenses can receive favorable tax treatment. Contribution limits and qualified-expense rules can change, so current plan and IRS materials matter for a specific decision.",
+        ],
+      },
+      {
+        key: "importantConsiderations",
+        title: "Important considerations",
+        body: [
+          "An HSA is different from a flexible spending account or health reimbursement arrangement, and having other coverage can affect contribution eligibility. A distribution used for something other than a qualified medical expense can have tax consequences.",
+          "This lesson is educational and does not determine eligibility, qualified expenses, or a contribution amount. Check current official guidance and consider qualified help for your situation.",
+        ],
+      },
+    ],
+    nextSteps: [
+      {
+        label: "Review your benefits materials",
+        href: "/profile",
+        description: "Keep only the workplace-benefit context you choose to share up to date.",
+      },
+      {
+        label: "Learn investing basics",
+        href: "/learn/investing-basics",
+        description: "See how an account differs from the investments it may hold.",
+      },
+    ],
+    relatedSlugs: ["employer-match", "investing-basics"],
+  },
 ];
 
 export function getPublishedLessons() {
