@@ -614,6 +614,22 @@ export const lessons: Lesson[] = [
     nextSteps: [{ label: "Learn credit utilization", href: "/learn/credit-utilization", description: "See how reported balances compare with available credit." }],
     relatedSlugs: ["credit-utilization", "apr", "diversification"],
   },
+  {
+    slug: "mortgages",
+    title: "Mortgages",
+    summary: "Understand the main parts of a mortgage payment before comparing home loans.",
+    topic: "Home buying",
+    estimatedMinutes: 6,
+    sections: [
+      { key: "whatItIs", title: "What it is", body: ["A mortgage is a loan secured by a home. The borrower repays principal, the amount borrowed, and interest, the lender's charge for providing the loan."] },
+      { key: "whyItMatters", title: "Why it matters", body: ["A mortgage is a long-term commitment with costs beyond the advertised principal-and-interest payment. Understanding the full payment makes home-buying comparisons clearer."] },
+      { key: "whoItIsFor", title: "Who it is for", body: ["This lesson is for people learning home-buying vocabulary or preparing to read a Loan Estimate. It is education, not a determination of whether someone should buy a home or borrow."] },
+      { key: "howItWorks", title: "How it works", body: ["A total monthly payment may include principal, interest, property taxes, homeowners insurance, and mortgage insurance. Taxes and insurance may be collected through an escrow account, depending on the loan.", "A loan's rate, term, amount, down payment, fees, and other features affect its cost. Homeowners may also have association dues and maintenance costs outside the mortgage payment."] },
+      { key: "importantConsiderations", title: "Important considerations", body: ["A lower monthly principal-and-interest payment does not necessarily mean a lower total cost. Adjustable rates, points, prepayment penalties, balloon features, closing costs, and insurance requirements can change the tradeoffs.", "This lesson is educational and does not estimate affordability, recommend a loan, or provide lending advice. Review current loan documents and consider qualified help for a decision specific to you."] },
+    ],
+    nextSteps: [{ label: "Review credit scores", href: "/learn/credit-scores", description: "Understand one type of information lenders may consider." }],
+    relatedSlugs: ["credit-scores", "emergency-fund", "diversification"],
+  },
 ];
 
 export function getPublishedLessons() {
