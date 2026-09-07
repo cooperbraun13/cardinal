@@ -38,6 +38,68 @@ export function buildCardinalPlan(context: PlanContext): PlanRecommendation[] {
     });
   }
 
+  const goalRecommendation = {
+    reduce_debt: {
+      label: "reduce debt",
+      title: "Learn how to organize debt next steps",
+      action: "Review your balances, rates, and payment dates before choosing a payoff approach.",
+      rationale: "A clear list of debts makes interest costs and possible next steps easier to understand.",
+      href: "/money",
+      linkLabel: "Review Money",
+    },
+    build_emergency_fund: {
+      label: "build an emergency fund",
+      title: "Learn the emergency-fund basics",
+      action: "Use the emergency-fund lesson and calculator to explore a target that fits your situation.",
+      rationale: "A cash cushion can make unexpected expenses easier to handle without new debt.",
+      href: "/learn/emergency-fund",
+      linkLabel: "Learn about emergency funds",
+    },
+    start_investing: {
+      label: "start investing",
+      title: "Build an investing foundation",
+      action: "Start with account and investment concepts before deciding what to do.",
+      rationale: "Understanding the vocabulary makes future investing choices easier to evaluate.",
+      href: "/learn/investing-basics",
+      linkLabel: "Learn investing basics",
+    },
+    buy_home: {
+      label: "prepare to buy a home",
+      title: "Learn the home-buying basics",
+      action: "Explore mortgage costs and the questions to consider before buying a home.",
+      rationale: "Home buying combines a long-term loan with costs beyond the monthly payment.",
+      href: "/learn/mortgages",
+      linkLabel: "Learn about mortgages",
+    },
+    understand_money: {
+      label: "understand money basics",
+      title: "Start with one money concept",
+      action: "Choose a focused lesson and build understanding one step at a time.",
+      rationale: "A small, clear starting point can make unfamiliar financial topics easier to approach.",
+      href: "/learn",
+      linkLabel: "Browse Learn",
+    },
+  } as const;
+
+  if (context?.primaryGoal) {
+    const goal = goalRecommendation[context.primaryGoal as keyof typeof goalRecommendation];
+    const goalAlreadyCovered =
+      (context.primaryGoal === "reduce_debt" && context.creditCardDebtStatus === "some") ||
+      (context.primaryGoal === "build_emergency_fund" && ["not_started", "starter_fund"].includes(context.emergencyFundStatus ?? "")) ||
+      (context.primaryGoal === "start_investing" && context.investingExperience === "new");
+    if (goal && !goalAlreadyCovered) {
+      const { label, ...recommendation } = goal;
+      recommendations.push({
+        id: `goal-${context.primaryGoal}`,
+        priority: 85,
+        ...recommendation,
+        whySuggested: `You selected “${label}” as your primary goal.`,
+        inputsUsed: ["primaryGoal"],
+        assumptions: ["This is an educational starting point; Cardinal does not decide which action is right for you."],
+      });
+    }
+  }
+
   if (context?.creditCardDebtStatus === "some") {
     recommendations.push({
       id: "understand-high-interest-card-debt",
