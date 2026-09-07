@@ -40,6 +40,11 @@ describe("calculateCompoundGrowth", () => {
     expect(() => calculateCompoundGrowth({ initialAmount: 1, monthlyContribution: 0, annualRatePercent: 5, years: Number.MAX_VALUE })).toThrow();
   });
 
+  it("rejects rates and terms outside the user-facing bounds", () => {
+    expect(() => calculateCompoundGrowth({ initialAmount: 100, monthlyContribution: 0, annualRatePercent: 1000.1, years: 1 })).toThrow();
+    expect(() => calculateCompoundGrowth({ initialAmount: 100, monthlyContribution: 0, annualRatePercent: 5, years: 100.1 })).toThrow();
+  });
+
   it("returns finite monetary outputs", () => {
     const result = calculateCompoundGrowth({ initialAmount: 100, monthlyContribution: 10, annualRatePercent: 8, years: 5 });
     expect(Number.isFinite(result.endingBalance)).toBe(true);

@@ -12,6 +12,9 @@ export type CompoundGrowthResult = {
   months: number;
 };
 
+export const COMPOUND_GROWTH_MAX_RATE_PERCENT = 1_000;
+export const COMPOUND_GROWTH_MAX_YEARS = 100;
+
 function roundToCents(value: number): number {
   const scaledValue = value * 100;
   // At the edge of the representable range, multiplying by 100 can overflow
@@ -26,6 +29,12 @@ export function calculateCompoundGrowth(input: CompoundGrowthInput): CompoundGro
   }
   if (initialAmount < 0 || monthlyContribution < 0 || years < 0) {
     throw new Error("Amounts and years cannot be negative.");
+  }
+  if (annualRatePercent > COMPOUND_GROWTH_MAX_RATE_PERCENT) {
+    throw new Error(`Annual rate must be ${COMPOUND_GROWTH_MAX_RATE_PERCENT}% or lower.`);
+  }
+  if (years > COMPOUND_GROWTH_MAX_YEARS) {
+    throw new Error(`Years must be ${COMPOUND_GROWTH_MAX_YEARS} or lower.`);
   }
   if (annualRatePercent <= -1200) {
     throw new Error("Annual rate must be greater than -1200 percent.");
