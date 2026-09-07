@@ -10,6 +10,7 @@ export type FinancialProfileValues = {
   investingExperience: string | null;
   riskComfort: string | null;
   primaryGoal: string | null;
+  investmentAccountType: string | null;
 };
 
 export const emptyFinancialProfile: FinancialProfileValues = {
@@ -24,4 +25,5 @@ export const emptyFinancialProfile: FinancialProfileValues = {
   investingExperience: null,
   riskComfort: null,
   primaryGoal: null,
+  investmentAccountType: null,
 };

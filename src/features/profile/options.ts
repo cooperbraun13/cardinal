@@ -60,6 +60,15 @@ export const PRIMARY_GOALS = [
   "understand_money",
 ] as const;
 
+export const INVESTMENT_ACCOUNT_TYPES = [
+  "none",
+  "employer_plan",
+  "ira",
+  "brokerage",
+  "hsa",
+  "multiple",
+] as const;
+
 export const PROFILE_OPTION_LABELS: Record<string, string> = {
   employed: "Employed",
   self_employed: "Self-employed",
@@ -97,4 +106,9 @@ export const PROFILE_OPTION_LABELS: Record<string, string> = {
   start_investing: "Start investing",
   buy_home: "Prepare to buy a home",
   understand_money: "Understand money basics",
+  employer_plan: "Employer plan (such as a 401(k))",
+  ira: "IRA",
+  brokerage: "Brokerage account",
+  hsa: "HSA",
+  multiple: "More than one account type",
 };

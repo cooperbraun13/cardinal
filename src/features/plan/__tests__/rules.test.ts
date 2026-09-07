@@ -16,6 +16,7 @@ const profile = (
   investingExperience: null,
   riskComfort: null,
   primaryGoal: null,
+  investmentAccountType: null,
   ...changes,
 });
 

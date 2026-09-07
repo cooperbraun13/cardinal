@@ -18,6 +18,7 @@ import {
   INVESTING_EXPERIENCE_LEVELS,
   RISK_COMFORT_LEVELS,
   PRIMARY_GOALS,
+  INVESTMENT_ACCOUNT_TYPES,
   SAVINGS_RANGES,
 } from "@/features/profile/options";
 
@@ -154,5 +155,6 @@ export const profileUpdateSchema = z.object({
   employerMatchStatus: z.enum(EMPLOYER_RETIREMENT_STATUSES).nullable(),
   investingExperience: z.enum(INVESTING_EXPERIENCE_LEVELS).nullable(),
   riskComfort: z.enum(RISK_COMFORT_LEVELS).nullable(),
-  primaryGoal: z.enum(PRIMARY_GOALS).nullable(),
+  primaryGoal: z.enum(PRIMARY_GOALS).nullable().optional().default(null),
+  investmentAccountType: z.enum(INVESTMENT_ACCOUNT_TYPES).nullable().optional().default(null),
 }).strict();

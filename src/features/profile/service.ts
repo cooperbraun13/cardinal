@@ -15,6 +15,7 @@ const profileSelect = {
   investingExperience: true,
   riskComfort: true,
   primaryGoal: true,
+  investmentAccountType: true,
 } as const;
 
 function hasAnswers(values: FinancialProfileValues) {

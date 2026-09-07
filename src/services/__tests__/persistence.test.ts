@@ -45,6 +45,7 @@ const profileInput = (extra = {}) => ({
   investingExperience: "new",
   riskComfort: "not_sure",
   primaryGoal: "understand_money",
+  investmentAccountType: "none",
   ...extra,
 });
 
@@ -221,6 +222,7 @@ describe("financial profile persistence", () => {
       creditCardDebtStatus: "some",
       profileVersion: 1,
       primaryGoal: "understand_money",
+      investmentAccountType: "none",
     });
     const updated = await profileRoute.PUT(request(profileInput({ riskComfort: "growth" }), "PUT"));
     expect(await updated.json()).toMatchObject({ profileVersion: 2, riskComfort: "growth" });
@@ -256,6 +258,13 @@ describe("financial profile persistence", () => {
       (
         await profileRoute.PUT(
           request(profileInput({ primaryGoal: "not_a_goal" }), "PUT"),
+        )
+      ).status,
+    ).toBe(400);
+    expect(
+      (
+        await profileRoute.PUT(
+          request(profileInput({ investmentAccountType: "account_number" }), "PUT"),
         )
       ).status,
     ).toBe(400);
