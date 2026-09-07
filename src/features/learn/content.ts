@@ -499,6 +499,25 @@ export const lessons: Lesson[] = [
     ],
     relatedSlugs: ["employer-match", "investing-basics"],
   },
+  {
+    slug: "brokerage-accounts",
+    title: "Brokerage accounts",
+    summary: "Understand the account used to buy and hold many kinds of investments.",
+    topic: "Investing",
+    estimatedMinutes: 6,
+    sections: [
+      { key: "whatItIs", title: "What it is", body: ["A brokerage account is an investment account at a brokerage firm. It can be used to buy, sell, and hold investments such as stocks, bonds, mutual funds, and exchange-traded funds."] },
+      { key: "whyItMatters", title: "Why it matters", body: ["A brokerage firm can offer taxable brokerage accounts and retirement accounts such as IRAs. The account type determines its tax rules, while the account holds and trades investments. Understanding that distinction makes account choices easier to compare."] },
+      { key: "whoItIsFor", title: "Who it is for", body: ["This lesson is for people who are new to investing or see brokerage accounts mentioned alongside IRAs and workplace plans."] },
+      { key: "howItWorks", title: "How it works", body: ["A person opens an account with a brokerage firm, adds cash, and chooses whether to buy investments. In a cash account, purchases must be paid in full by settlement; a margin account can involve borrowing from the broker and adds distinct risks.", "Brokerage firms can offer different products, services, and fee schedules. Account, transaction, transfer, and investment-level costs can all affect an account."] },
+      { key: "importantConsiderations", title: "Important considerations", body: ["Opening an account does not choose investments or guarantee returns. Investments can lose value, and fees, services, conflicts of interest, and account agreements vary by firm.", "This lesson is educational and does not recommend a brokerage, account type, or investment. Review current firm disclosures and consider qualified help for a decision specific to you."] },
+    ],
+    nextSteps: [
+      { label: "Learn investing basics", href: "/learn/investing-basics", description: "See the difference between an account and the investments inside it." },
+      { label: "Explore Invest", href: "/invest", description: "Continue with Cardinal's introductory investing education." },
+    ],
+    relatedSlugs: ["investing-basics", "roth-ira", "traditional-ira"],
+  },
 ];
 
 export function getPublishedLessons() {
