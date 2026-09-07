@@ -37,6 +37,7 @@ model FinancialProfile {
   employerMatchStatus  String?
   investingExperience  String?
   riskComfort          String?
+  primaryGoal          String?
   profileVersion       Int      @default(1)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt

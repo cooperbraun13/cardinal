@@ -14,6 +14,7 @@ const profileSelect = {
   employerMatchStatus: true,
   investingExperience: true,
   riskComfort: true,
+  primaryGoal: true,
 } as const;
 
 function hasAnswers(values: FinancialProfileValues) {

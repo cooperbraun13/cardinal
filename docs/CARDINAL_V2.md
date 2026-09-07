@@ -125,7 +125,7 @@ The twenty currently published lessons cover APR, credit utilization, emergency 
 
 The first profile migration is implemented. Profile information remains sensitive and optional: the current form stores only ranges and simple context, and an all-empty update removes the profile record. Updates increment the profile version for future plan and revision tracking. It does not collect account credentials, exact balances, employer identity, or investment holdings.
 
-The implemented initial record is a separate one-to-one `FinancialProfile` owned by `User`. Future child tables should be added only where answers are truly repeating. Store ranges and simple enums when exact amounts are unnecessary for the intended guidance.
+The implemented initial record is a separate one-to-one `FinancialProfile` owned by `User`. It now includes one optional primary goal as a simple enum so Plan rules can prioritize a direction without collecting exact balances. Future child tables should be added only where answers are truly repeating. Store ranges and simple enums when exact amounts are unnecessary for the intended guidance.
 
 | Area | Minimal useful data | Avoid by default |
 | --- | --- | --- |

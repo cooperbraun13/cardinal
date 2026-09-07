@@ -15,6 +15,7 @@ import {
   EMPLOYMENT_STATUSES,
   INVESTING_EXPERIENCE_LEVELS,
   PROFILE_OPTION_LABELS,
+  PRIMARY_GOALS,
   RISK_COMFORT_LEVELS,
   SAVINGS_RANGES,
 } from "@/features/profile/options";
@@ -237,6 +238,14 @@ export function ProfileForm({
             value={values.riskComfort}
             onChange={update}
           />
+        </div>
+      </section>
+
+      <section className="border-t border-border pt-design-md" aria-labelledby="goal-heading">
+        <p className="eyebrow">Direction</p>
+        <h2 id="goal-heading" className="mt-design-xxs section-title">What would feel most useful next?</h2>
+        <div className="mt-design-sm max-w-md">
+          <ProfileSelect field="primaryGoal" label="Primary financial goal" description="Choose one starting point. You can change it anytime." options={PRIMARY_GOALS} value={values.primaryGoal} onChange={update} />
         </div>
       </section>
 

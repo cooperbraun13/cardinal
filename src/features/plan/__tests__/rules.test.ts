@@ -15,6 +15,7 @@ const profile = (
   employerMatchStatus: null,
   investingExperience: null,
   riskComfort: null,
+  primaryGoal: null,
   ...changes,
 });
 
