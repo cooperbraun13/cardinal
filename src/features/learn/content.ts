@@ -550,6 +550,22 @@ export const lessons: Lesson[] = [
     nextSteps: [{ label: "Learn about ETFs", href: "/learn/etfs", description: "See how some index funds trade on an exchange." }],
     relatedSlugs: ["etfs", "brokerage-accounts", "investing-basics"],
   },
+  {
+    slug: "stocks",
+    title: "Stocks",
+    summary: "Learn what owning stock means and why a stock's value can change.",
+    topic: "Investing",
+    estimatedMinutes: 5,
+    sections: [
+      { key: "whatItIs", title: "What it is", body: ["A stock is a security that represents an ownership share in a company. Stockholders can have a claim on a proportional share of the company's assets and profits, and common stock can include voting rights."] },
+      { key: "whyItMatters", title: "Why it matters", body: ["Stocks appear directly in brokerage accounts and indirectly inside many funds. Knowing that a stock represents ownership helps explain both its potential returns and its risks."] },
+      { key: "whoItIsFor", title: "Who it is for", body: ["This lesson is for people who are new to investing or want a clearer definition of a stock before learning about funds and diversification."] },
+      { key: "howItWorks", title: "How it works", body: ["Companies can issue stock to raise money. A stock's price can change with company performance, investor expectations, market conditions, and events outside the company.", "Stockholders may receive dividends if a company chooses to distribute earnings, but dividends are not guaranteed. Shares are commonly bought and sold through a brokerage account."] },
+      { key: "importantConsiderations", title: "Important considerations", body: ["Stock prices can go down as well as up, and an investor can lose money. If a company fails, common stockholders are generally behind creditors and preferred stockholders in a liquidation.", "This lesson is educational and does not recommend a company or trade. An individual stock has company-specific risk; review disclosures and consider qualified help for decisions specific to you."] },
+    ],
+    nextSteps: [{ label: "Learn about index funds", href: "/learn/index-funds", description: "See how a fund can hold many securities." }],
+    relatedSlugs: ["index-funds", "etfs", "investing-basics"],
+  },
 ];
 
 export function getPublishedLessons() {
