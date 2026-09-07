@@ -20,14 +20,14 @@ This document describes the design system currently implemented in the applicati
 
 Cardinal uses Inter, loaded in `src/app/layout.tsx`, for interface and display text. Use the existing roles instead of introducing a separate display family.
 
-| Role | Current implementation | Intended use |
-| --- | --- | --- |
-| Page title | `.page-title`; 32px small screens, 56px from `sm` | A page’s main question or purpose |
-| Section title | `.section-title`; 26px, 36px from `lg` | Major content sections |
-| Display number | `.display-number`; 48px to 80px | One important financial value |
-| Body | 14px with 1.5–1.75 line height | Explanations and supporting information |
-| Eyebrow | `.eyebrow`; 11px uppercase with tracking | Short category labels, never primary content |
-| Action | `.text-link` and `Button`; uppercase, tracked | Clear, concise calls to action |
+| Role           | Current implementation                            | Intended use                                 |
+| -------------- | ------------------------------------------------- | -------------------------------------------- |
+| Page title     | `.page-title`; 32px small screens, 56px from `sm` | A page’s main question or purpose            |
+| Section title  | `.section-title`; 26px, 36px from `lg`            | Major content sections                       |
+| Display number | `.display-number`; 48px to 80px                   | One important financial value                |
+| Body           | 14px with 1.5–1.75 line height                    | Explanations and supporting information      |
+| Eyebrow        | `.eyebrow`; 11px uppercase with tracking          | Short category labels, never primary content |
+| Action         | `.text-link` and `Button`; uppercase, tracked     | Clear, concise calls to action               |
 
 Use sentence case for headings and labels. A title may be editorial, but should still say what a person can do or understand. Do not use all caps for paragraphs, financial values, or long headings.
 
@@ -35,17 +35,17 @@ Use sentence case for headings and labels. A title may be editorial, but should 
 
 The current product is dark by default. These values come from `src/app/globals.css`.
 
-| Token | Value | Use |
-| --- | --- | --- |
-| Background | `#181818` | Application canvas |
-| Foreground | `#ffffff` | Primary text and high-emphasis borders |
-| Card / secondary / muted | `#303030` | Panels, quiet fills, hover surfaces |
-| Popover | `#242424` | Menus and dialogs |
-| Muted foreground | `#969696` | Supporting copy and secondary labels |
-| Border | `#303030` | Structure between related content |
-| Primary | `#da291c` | Primary actions and active navigation indicator |
-| Primary hover / active | `#9d2211` / `#b01e0a` | Interactive states only |
-| Destructive | `#ff8b81` | Errors and destructive controls |
+| Token                    | Value                 | Use                                             |
+| ------------------------ | --------------------- | ----------------------------------------------- |
+| Background               | `#181818`             | Application canvas                              |
+| Foreground               | `#ffffff`             | Primary text and high-emphasis borders          |
+| Card / secondary / muted | `#303030`             | Panels, quiet fills, hover surfaces             |
+| Popover                  | `#242424`             | Menus and dialogs                               |
+| Muted foreground         | `#969696`             | Supporting copy and secondary labels            |
+| Border                   | `#303030`             | Structure between related content               |
+| Primary                  | `#da291c`             | Primary actions and active navigation indicator |
+| Primary hover / active   | `#9d2211` / `#b01e0a` | Interactive states only                         |
+| Destructive              | `#ff8b81`             | Errors and destructive controls                 |
 
 Do not introduce a new semantic color just to distinguish cards or lesson categories. Credit-card themes use restrained neutral material finishes so they do not compete with the product hierarchy. Do not rely on color alone for status; pair it with clear text, icons, or a visible label.
 
@@ -114,3 +114,17 @@ Use helpers from `src/lib/format.ts` for currency, dates, and numbers. Use `tabu
 - Does the page reuse existing component and spacing patterns?
 - Are red, borders, and panels serving hierarchy rather than decoration?
 - Does the page work at a narrow viewport and with keyboard navigation?
+
+## Recognizable section layouts
+
+The shared type, color, spacing, and control system stays consistent; each section uses a structure suited to its task:
+
+- **Home** is a welcome overview. A prominent next step comes from the existing Plan rules, followed by three compact section shortcuts. It does not invent progress or financial data.
+- **Money** leads with actual active-card balances and utilization, followed by recent recorded activity and a compact tool directory. New users see a first-card action instead of fabricated figures. Data comes from the existing owner-scoped dashboard service.
+- **Learn** is a reading library, with a topic index, a featured starting lesson, and grouped lesson rows. Topic links are ordinary anchors and remain usable without client JavaScript.
+- **Plan** is a numbered timeline. The first suggestion receives emphasis; expandable reasoning preserves the rationale, source context, and all assumptions. Numbers describe order, not completion.
+- **Invest** retains its educational entry points; **Profile** retains its account and optional-answer form layout.
+
+Primary navigation combines section icons, a filled selected state, and an underline. Mobile headers show the current section when space permits; the navigation dialog retains selection and keyboard behavior. Money and its child routes also show a horizontally scrollable section navigation, including calculators. Child routes keep their parent section selected.
+
+Use these differences in hierarchy and structure before introducing additional decorative images or section colors.

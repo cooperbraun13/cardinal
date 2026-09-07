@@ -19,6 +19,17 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const isLogin = mode === "login";
+  const copy = isLogin
+    ? {
+        title: "Continue with clarity.",
+        description:
+          "Pick up where you left off across your money, learning, and plan.",
+      }
+    : {
+        title: "Your financial starting point.",
+        description:
+          "Create a private place to understand your money, learn the basics, and plan what comes next.",
+      };
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -58,26 +69,52 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       <div className="grid min-h-[calc(100svh-64px)] lg:grid-cols-[1.1fr_1fr]">
         <aside className="relative isolate flex min-h-64 items-end overflow-hidden bg-background sm:min-h-80 lg:min-h-full">
           <Image
-            src="/cardinal-cinema-hd.png"
+            src="/cardinal-login-architecture.webp"
             alt=""
             fill
             priority
             quality={100}
-            sizes="(min-width: 1024px) 55vw, 100vw"
-            className="-z-20 object-cover object-[65%_center]"
+            sizes="(min-width: 1024px) 52.4vw, 100vw"
+            className="-z-20 object-cover object-top"
           />
           <div className="absolute inset-0 -z-10 bg-linear-to-t from-background/95 via-background/20 to-transparent" />
           <div className="px-design-xs py-design-md sm:px-design-md lg:px-design-xl lg:py-design-xxl">
-            <p className="eyebrow text-white">Credit. Considered.</p>
+            <p className="eyebrow text-white">Money, made clear.</p>
             <h2 className="mt-design-sm text-[32px] leading-[1.05] font-medium tracking-[-.02em] sm:text-[56px] xl:text-[80px]">
-              Every card.
+              Your money.
               <br />
-              Every possibility.
+              In focus.
             </h2>
             <p className="mt-design-sm max-w-sm text-sm leading-6 text-white">
-              Discover the full potential of your wallet. Balances, rewards, and
-              benefits, brought into focus.
+              Track what matters, learn the basics, explore investing, and make
+              your next decision with confidence.
             </p>
+            <ul className="mt-design-md grid max-w-sm gap-design-xs border-t border-white/30 pt-design-sm text-sm text-white sm:grid-cols-2 sm:gap-design-sm lg:grid-cols-4">
+              <li>
+                <span className="block font-medium">Money</span>
+                <span className="mt-1 block text-white/70">
+                  See what you have.
+                </span>
+              </li>
+              <li>
+                <span className="block font-medium">Invest</span>
+                <span className="mt-1 block text-white/70">
+                  Explore your options.
+                </span>
+              </li>
+              <li>
+                <span className="block font-medium">Learn</span>
+                <span className="mt-1 block text-white/70">
+                  Understand what matters.
+                </span>
+              </li>
+              <li>
+                <span className="block font-medium">Plan</span>
+                <span className="mt-1 block text-white/70">
+                  Choose what comes next.
+                </span>
+              </li>
+            </ul>
           </div>
         </aside>
         <main className="flex items-center justify-center px-design-xs py-design-xl sm:px-design-md lg:px-design-xl">
@@ -85,13 +122,9 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             <p className="eyebrow">
               {isLogin ? "Welcome back" : "Get started"}
             </p>
-            <h1 className="page-title mt-3">
-              {isLogin ? "Welcome back." : "Your next chapter."}
-            </h1>
+            <h1 className="page-title mt-3">{copy.title}</h1>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              {isLogin
-                ? "Review your cards, rewards, benefits, and recent activity."
-                : "Build a clear, private view of every credit card you manage."}
+              {copy.description}
             </p>
 
             <form

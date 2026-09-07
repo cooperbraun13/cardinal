@@ -1,61 +1,124 @@
-import Link from "next/link";
-import { ArrowRightIcon, BarChart3Icon, CalculatorIcon, CreditCardIcon, GiftIcon, ReceiptTextIcon } from "lucide-react";
+﻿import Link from "next/link";
+import { redirect } from "next/navigation";
+import { ArrowRightIcon, WalletCardsIcon } from "lucide-react";
+import { getCurrentUser } from "@/lib/auth";
+import { getDashboardData } from "@/services/data";
+import { formatCurrency } from "@/lib/format";
+import { MONEY_LINKS } from "@/lib/navigation";
 import { PageHeader } from "@/components/PageHeader";
-
-const CREDIT_TOOLS = [
-  { href: "/dashboard", label: "Credit overview", description: "See balances, utilization, due dates, rewards, and recent activity.", icon: BarChart3Icon },
-  { href: "/cards", label: "Cards", description: "Manage your wallet, card details, and reward rules.", icon: CreditCardIcon },
-  { href: "/transactions", label: "Activity", description: "Follow purchases, refunds, and rewards across your cards.", icon: ReceiptTextIcon },
-  { href: "/benefits", label: "Benefits", description: "Keep card credits and perks from going unused.", icon: GiftIcon },
-];
-
-const MONEY_TOOLS = [
-  { href: "/calculators", label: "Calculators", description: "Explore focused illustrations for savings, investing, debt, and home-buying questions.", icon: CalculatorIcon },
-];
+import { SectionHeader } from "@/components/SectionHeader";
+import { Metric } from "@/components/Metric";
+import { UtilizationBar } from "@/components/UtilizationBar";
+import { TransactionTable } from "@/components/TransactionTable";
+import { EmptyState } from "@/components/EmptyState";
+import { AddCardButton, AddTransactionButton } from "@/components/AddButtons";
 
 export const metadata = { title: "Money - Cardinal" };
 
-export default function MoneyPage() {
+export default async function MoneyPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  const data = await getDashboardData(user.id);
+  const hasActiveCards = data.cards.length > 0;
+
   return (
     <div className="page-shell page-stack">
       <PageHeader
-        eyebrow="Money"
-        title="Make your credit cards work harder."
-        description="Your current Cardinal tools live here. More money topics will join them as they are ready."
+        eyebrow="Money / Summary"
+        title="Your money at a glance."
+        description="Your manually tracked credit cards, with the details that matter up front."
+        actions={
+          hasActiveCards ? (
+            <AddTransactionButton cards={data.cards} />
+          ) : undefined
+        }
       />
-      <section aria-labelledby="credit-heading">
-        <p className="eyebrow">Credit</p>
-        <h2 id="credit-heading" className="mt-design-xxs section-title">Your current credit tools</h2>
-        <div className="mt-design-sm grid gap-design-sm md:grid-cols-2">
-          {CREDIT_TOOLS.map(({ href, label, description, icon: Icon }) => (
-            <Link key={href} href={href} className="panel panel-body group min-h-48 transition-colors hover:bg-muted">
-              <Icon className="size-5 text-muted-foreground" aria-hidden="true" />
-              <h3 className="mt-design-md text-xl font-medium tracking-tight">{label}</h3>
-              <p className="mt-design-xxs text-sm leading-6 text-muted-foreground">{description}</p>
-              <span className="text-link mt-design-sm">Open {label} <ArrowRightIcon className="size-4" /></span>
+      {hasActiveCards ? (
+        <section
+          className="grid gap-design-md border-y border-border py-design-md lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]"
+          aria-label="Credit card summary"
+        >
+          <Metric
+            label="Total card balance"
+            value={formatCurrency(data.totals.totalBalance)}
+            emphasis
+            detail={`Across ${data.cards.length} active ${data.cards.length === 1 ? "card" : "cards"}`}
+          />
+          <div className="min-w-0 lg:border-l lg:border-border lg:pl-design-md">
+            <div className="flex flex-wrap items-baseline justify-between gap-design-xs">
+              <p className="eyebrow">Credit in use</p>
+              <p className="text-3xl font-medium tabular-nums">
+                {data.totals.overallUtilization.toFixed(1)}%
+              </p>
+            </div>
+            <UtilizationBar
+              value={data.totals.overallUtilization}
+              className="mt-design-sm"
+            />
+            <p className="mt-design-xs text-sm text-muted-foreground">
+              {formatCurrency(data.totals.availableCredit)} available of{" "}
+              {formatCurrency(data.totals.totalLimit)}
+            </p>
+            <Link href="/cards" className="text-link mt-design-xs">
+              Review your cards{" "}
+              <ArrowRightIcon className="size-4" aria-hidden="true" />
             </Link>
-          ))}
-        </div>
-      </section>
-      <section className="border-t border-border pt-design-md" aria-labelledby="money-tools-heading">
-        <p className="eyebrow">Money tools</p>
-        <h2 id="money-tools-heading" className="mt-design-xxs section-title">Explore a focused question</h2>
-        <div className="mt-design-sm grid gap-design-sm md:grid-cols-2">
-          {MONEY_TOOLS.map(({ href, label, description, icon: Icon }) => (
-            <Link key={href} href={href} className="panel panel-body group min-h-48 transition-colors hover:bg-muted">
-              <Icon className="size-5 text-muted-foreground" aria-hidden="true" />
-              <h3 className="mt-design-md text-xl font-medium tracking-tight">{label}</h3>
-              <p className="mt-design-xxs text-sm leading-6 text-muted-foreground">{description}</p>
-              <span className="text-link mt-design-sm">Open {label} <ArrowRightIcon className="size-4" /></span>
-            </Link>
-          ))}
-        </div>
-      </section>
-      <section className="border-t border-border pt-design-md">
-        <Link href="/optimizer" className="text-link">
-          Find the best card for a purchase <ArrowRightIcon className="size-4" />
-        </Link>
-      </section>
+          </div>
+        </section>
+      ) : (
+        <EmptyState
+          icon={WalletCardsIcon}
+          title="No active cards yet."
+          description="Add a card to bring active balances and credit limits into view."
+          action={<AddCardButton label="Add a card" size="default" />}
+          className="border-y border-border"
+        />
+      )}
+      <div className="grid items-start gap-design-lg xl:grid-cols-[minmax(0,1fr)_18rem]">
+        <section className="min-w-0" aria-labelledby="money-activity-heading">
+          <SectionHeader
+            title={<span id="money-activity-heading">Recent activity</span>}
+            description="Your latest recorded purchases and refunds"
+            action={
+              <Link href="/transactions" className="text-link">
+                All activity{" "}
+                <ArrowRightIcon className="size-4" aria-hidden="true" />
+              </Link>
+            }
+          />
+          <div className="mt-design-sm">
+            <TransactionTable transactions={data.recentTransactions} linkRows />
+          </div>
+        </section>
+        <aside
+          className="min-w-0 border-t border-border pt-design-sm xl:border-t-0 xl:border-l xl:pt-0 xl:pl-design-sm"
+          aria-labelledby="money-tools-heading"
+        >
+          <h2 id="money-tools-heading" className="text-xl font-medium">
+            Your money tools
+          </h2>
+          <nav
+            aria-label="Money tools"
+            className="mt-design-xs divide-y divide-border"
+          >
+            {MONEY_LINKS.filter(({ href }) => href !== "/money").map(
+              ({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="flex min-h-12 items-center justify-between gap-design-xs py-design-xs text-sm transition-colors hover:bg-muted"
+                >
+                  {label}
+                  <ArrowRightIcon
+                    className="size-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                </Link>
+              ),
+            )}
+          </nav>
+        </aside>
+      </div>
     </div>
   );
 }

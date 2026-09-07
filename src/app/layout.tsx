@@ -7,7 +7,7 @@ const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Cardinal",
   description:
-    "Track credit cards, rewards, benefits, and the best card for every purchase.",
+    "Understand your money, learn the basics, explore investing, and plan what comes next.",
   applicationName: "Cardinal",
 };
 
